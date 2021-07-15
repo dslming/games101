@@ -1,7 +1,17 @@
 cmake_minimum_required (VERSION 2.8.11)
-project (Transformation)
+set(projectName "demo")
 
-find_package(Eigen3 REQUIRED)
-include_directories(EIGEN3_INCLUDE_DIR)
+project (${projectName})
 
-add_executable (Transformation main.cpp)
+if (WIN32)
+  message("windows 平台...")
+  set(EIGEN3_INCLUDE_DIR "C:\\Program Files (x86)\\Eigen3\\include\\eigen3")
+  include_directories(${EIGEN3_INCLUDE_DIR})
+endif()
+
+if (APPLE)
+  message("APPLE 平台...")
+  set(EIGEN3_INCLUDE_DIR "...")
+endif()
+
+add_executable (${projectName} main.cpp)
