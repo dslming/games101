@@ -5,7 +5,7 @@
 #include <fstream>
 #include "Scene.hpp"
 #include "Renderer.hpp"
-#include "omp.h"
+// #include "omp.h"
 
 
 inline float deg2rad(const float& deg) { return deg * M_PI / 180.0; }
@@ -31,7 +31,7 @@ void Renderer::Render(const Scene& scene)
     // change the spp value to change sample ammount
     int spp = 8;
     std::cout << "SPP: " << spp << "\n";
-    //#pragma omp parallel for 
+    //#pragma omp parallel for
     //config for the simple multithreading code
     for (uint32_t j = 0; j < scene.height; ++j) {
         for (uint32_t i = 0; i < scene.width; ++i) {
@@ -43,7 +43,7 @@ void Renderer::Render(const Scene& scene)
             Vector3f dir = normalize(Vector3f(-x, y, 1));
             thread_local Vector3f color = Vector3f(0.0);
             for (int k = 0; k < spp; k++){
-                framebuffer[m] += scene.castRay(Ray(eye_pos, dir), 0) / spp;  
+                framebuffer[m] += scene.castRay(Ray(eye_pos, dir), 0) / spp;
             }
             m++;
             }
@@ -57,7 +57,7 @@ void Renderer::Render(const Scene& scene)
     // change the spp value to change sample ammount
     int spp = 8;
     std::cout << "SPP: " << spp << "\n";
-    #pragma omp parallel for 
+    #pragma omp parallel for
     //config for the simple multithreading code
     for (uint32_t j = 0; j < scene.height; ++j) {
         for (uint32_t i = 0; i < scene.width; ++i) {
@@ -70,7 +70,7 @@ void Renderer::Render(const Scene& scene)
             thread_local Vector3f color;
             color = Vector3f(0);
             for (int k = 0; k < spp; k++){
-                color += scene.castRay(Ray(eye_pos, dir), 0) / spp;  
+                color += scene.castRay(Ray(eye_pos, dir), 0) / spp;
             }
             framebuffer[j*scene.width + i]+= color;
             #pragma omp critical
@@ -94,5 +94,5 @@ void Renderer::Render(const Scene& scene)
         color[2] = (unsigned char)(255 * std::pow(clamp(0, 1, framebuffer[i].z), 0.6f));
         fwrite(color, 1, 3, fp);
     }
-    fclose(fp);    
+    fclose(fp);
 }

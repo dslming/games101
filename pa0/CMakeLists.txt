@@ -6,12 +6,13 @@ project (${projectName})
 if (WIN32)
   message("windows 平台...")
   set(EIGEN3_INCLUDE_DIR "C:\\Program Files (x86)\\Eigen3\\include\\eigen3")
-  include_directories(${EIGEN3_INCLUDE_DIR})
 endif()
 
 if (APPLE)
   message("APPLE 平台...")
-  set(EIGEN3_INCLUDE_DIR "...")
+  set(EIGEN3_INCLUDE_DIR "/usr/local/include/eigen3/")
 endif()
+
+include_directories(${EIGEN3_INCLUDE_DIR})
 
 add_executable (${projectName} main.cpp)
