@@ -78,9 +78,13 @@ namespace rst {
         std::vector<float> depth_buf;
         int get_index(int x, int y);
 
+        // 窗口尺寸
         int width, height;
 
         int next_id = 0;
-        int get_next_id() { return next_id++; }
+        int get_next_id()
+        {
+            return next_id++;
+        }
     };
 }

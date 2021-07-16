@@ -6,6 +6,7 @@
 
 using namespace rst;
 
+// 加载模型的顶点
 pos_buf_id rasterizer::load_positions(const std::vector<Eigen::Vector3f> &positions)
 {
     auto id = get_next_id();
@@ -14,6 +15,7 @@ pos_buf_id rasterizer::load_positions(const std::vector<Eigen::Vector3f> &positi
     return {id};
 }
 
+// 加载模型的顶点索引
 ind_buf_id rasterizer::load_indices(const std::vector<Eigen::Vector3i> &indices)
 {
     auto id = get_next_id();
@@ -212,6 +214,7 @@ void rasterizer::clear(Buffers buff)
     }
 }
 
+// 构造函数
 rasterizer::rasterizer(int w, int h) : width(w), height(h)
 {
     frame_buf.resize(w * h);
