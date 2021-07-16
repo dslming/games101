@@ -7,7 +7,24 @@ void load_positions(const std::vector<Eigen::Vector3f> &positions){
 
 }
 
-    main(void)
+class A {
+  private:
+    int value = 1;
+
+  public:
+    // 常量成员函数不能修改属性
+    void a(void) const
+    {
+      // value = 2;
+    }
+
+    void b(void)
+    {
+      value = 2;
+    }
+};
+
+main(void)
 {
   // std::vector<Eigen::Vector3f> pos = {
   //   {2, 0, -2},
@@ -47,11 +64,15 @@ void load_positions(const std::vector<Eigen::Vector3f> &positions){
   //   cout << vec << endl;
   // }
 
-  int a = 1;
-  int &aa = a;
-  cout << a << endl;
-  cout << aa << endl;
-  aa = 2;
-  cout << a << endl;
-  cout << aa << endl;
+  // int a = 1;
+  // int &aa = a;
+  // cout << a << endl;
+  // cout << aa << endl;
+  // aa = 2;
+  // cout << a << endl;
+  // cout << aa << endl;
+
+  A a;
+  a.a();
+  a.b();
 }

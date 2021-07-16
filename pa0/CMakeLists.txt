@@ -2,7 +2,7 @@ cmake_minimum_required (VERSION 2.8.11)
 set(projectName "demo")
 
 project (${projectName})
-# set(CMAKE_CXX_STANDARD c)
+set(CMAKE_CXX_STANDARD 17)
 
 if (WIN32)
   message("windows 平台...")
