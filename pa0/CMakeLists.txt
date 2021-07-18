@@ -2,6 +2,7 @@ cmake_minimum_required (VERSION 2.8.11)
 set(projectName "demo")
 
 project (${projectName})
+set(CMAKE_CXX_STANDARD 17)
 
 if (WIN32)
   message("windows 平台...")
@@ -15,4 +16,4 @@ endif()
 
 include_directories(${EIGEN3_INCLUDE_DIR})
 
-add_executable (${projectName} main.cpp)
+add_executable (${projectName} 1.cpp)
