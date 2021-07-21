@@ -1,3 +1,4 @@
+// 包含了整个框架中会使用的基本函数和变量
 #pragma once
 
 #include <cmath>

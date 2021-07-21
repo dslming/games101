@@ -227,7 +227,7 @@ void Renderer::Render(const Scene& scene)
             // TODO: Find the x and y positions of the current pixel to get the direction
             // vector that passes through it.
             // Also, don't forget to multiply both of them with the variable *scale*, and
-            // x (horizontal) variable with the *imageAspectRatio*      
+            // x (horizontal) variable with the *imageAspectRatio*
             x = imageAspectRatio * ( 2*float(i +0.5f) / (float)scene.width - 1 );
             y = 1 - ( 2 *float(j+0.5f) / float(scene.height) );
             //std::cout << x <<"---"<<y <<'\n';
@@ -235,7 +235,7 @@ void Renderer::Render(const Scene& scene)
             dir = normalize(dir);
             framebuffer[m++] = castRay(eye_pos, dir, scene, 0);
         }
-        UpdateProgress(j / (float)scene.height);  
+        UpdateProgress(j / (float)scene.height);
     }
 
     // save framebuffer to file
@@ -248,5 +248,5 @@ void Renderer::Render(const Scene& scene)
         color[2] = (char)(255 * clamp(0, 1, framebuffer[i].z));
         fwrite(color, 1, 3, fp);
     }
-    fclose(fp);    
+    fclose(fp);
 }
