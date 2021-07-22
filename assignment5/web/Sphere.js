@@ -10,20 +10,27 @@ export default class Sphere extends Object {
     this.radius2 = r*r
   }
 
-  intersect( orig, dir, tnear ) {
+  intersect( orig, dir, param ) {
     // analytic solution
-    var L = new Vector3().subVectors(orig.center);
+    var L = new Vector3().subVectors(orig, this.center);
     var a = new Vector3().dotProduct(dir, dir);
     var b = 2 * new Vector3().dotProduct(dir, L);
-    var c = new Vector3().dotProduct(L, L) - radius2;
-    var t0, t1;
-    if (!solveQuadratic(a, b, c, t0, t1))
+    var c = new Vector3().dotProduct(L, L) - this.radius2;
+    var options = {
+      t0: 0,
+      t1: 0
+    }
+    if (!solveQuadratic(a, b, c, options))
       return false;
-    if (t0 < 0)
-      t0 = t1;
-    if (t0 < 0)
+    if (options.t0 < 0)
+      options.t0 = options.t1;
+    if (options.t0 < 0)
       return false;
-    tnear = t0;
+    param.tNearK = options.t0;
     return true;
+  }
+
+  getSurfaceProperties(param) {
+    param.N = new Vector3().subVectors(param.P, this.center).normalize();
   }
 }

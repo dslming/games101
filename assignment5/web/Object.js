@@ -1,4 +1,5 @@
 import { MaterialType } from './global.js'
+import { Vector3 } from './Vector3.js'
 
 export default class Object {
   constructor() {
@@ -6,7 +7,7 @@ export default class Object {
     this.ior = 1.3
     this.Kd = 0.8
     this.Ks = 0.2
-    this.diffuseColor = 0.2
+    this.diffuseColor = new Vector3(0.2,0.2,0.2)
     this.specularExponent = 25
   }
   intersect() {

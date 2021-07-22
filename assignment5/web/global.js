@@ -1,26 +1,26 @@
 // 包含了整个框架中会使用的基本函数和变量
 const M_PI = 3.14159265358979323846;
-let kInfinity
+let kInfinity = Infinity
 
 function clamp(lo, hi, v) {
   return Math.max(lo, Math.min(hi, v));
 }
 
-function solveQuadratic(a, b, c, x0, x1) {
+function solveQuadratic(a, b, c, options) {
   var discr = b * b - 4 * a * c;
   if (discr < 0)
     return false;
   else if (discr == 0)
-    x0 = x1 = -0.5 * b / a;
+    options.x0 = options.x1 = -0.5 * b / a;
   else {
-    var q = (b > 0) ? -0.5 * (b + Math.sqrt(discr)) : -0.5 * (b - sqrt(discr));
-    x0 = q / a;
-    x1 = c / q;
+    var q = (b > 0) ? -0.5 * (b + Math.sqrt(discr)) : -0.5 * (b - Math.sqrt(discr));
+    options.x0 = q / a;
+    options.x1 = c / q;
   }
-  if (x0 > x1) {
-    var temp = x0
-    x0 = x1
-    x1 = temp
+  if (options.x0 > options.x1) {
+    var temp = options.x0
+    options.x0 = options.x1
+    options.x1 = temp
   }
   return true;
 }
@@ -59,5 +59,6 @@ export {
   solveQuadratic,
   MaterialType,
   get_random_float,
-  UpdateProgress
+  UpdateProgress,
+  kInfinity
 }

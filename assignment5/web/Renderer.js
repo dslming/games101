@@ -1,4 +1,5 @@
-import { M_PI, clamp } from './global.js'
+import { M_PI, clamp, kInfinity } from './global.js'
+import { Vector3 } from './Vector3.js';
 
 function deg2rad(deg) {
   return deg * M_PI / 180.0;
@@ -6,7 +7,10 @@ function deg2rad(deg) {
 
 // Compute reflection direction
 function reflect(I, N) {
-  return I - 2 * dotProduct(I, N) * N;
+  // return I - 2 * temp * N;
+  const temp = new Vector3().dotProduct(I, N)
+  const a = N.multiplyScalar(2*temp)
+  return I.sub(a);
 }
 
 function refract(I, N, ior) {
@@ -45,18 +49,23 @@ function fresnel( I, N,ior) {
 }
 
 function trace( orig, dir,objects) {
-  var tNear = kInfinity;
-  var payload = {}
-  for (let object in objects) {
-    var tNearK = kInfinity;
-    var indexK;
-    var uvK;
-    if (object.intersect(orig, dir, tNearK, indexK, uvK) && tNearK < tNear) {
-      payload.hit_obj = object.get();
-      payload.tNear = tNear
-      payload.index = indexK
-      payload.uv = uvK
-      tNear = tNearK;
+  let tNear = kInfinity;
+  var payload = null
+  for (let i = 0; i < objects.length; i++) {
+    var object = objects[i]
+    const option = {
+      tNearK: kInfinity,
+      indexK: 0,
+      uvK: 0
+    }
+    const flag = object.intersect(orig, dir, option)
+    if (flag && option.tNearK < tNear) {
+      payload = {}
+      payload.hit_obj = object;
+      payload.tNear = option.tNearK
+      payload.index = option.indexK
+      payload.uv = option.uvK
+      tNear = option.tNearK;
     }
   }
   return payload;
@@ -69,69 +78,82 @@ function castRay( orig, dir, scene, depth) {
 
   var hitColor = scene.backgroundColor;
   var payload = trace(orig, dir, scene.get_objects());
+
   if (payload) {
-    var hitPoint = orig + dir * payload.tNear;
-    var N; // normal
-    var st; // st coordinates
-    payload.hit_obj.getSurfaceProperties(hitPoint, dir, payload.index, payload.uv, N, st);
+    var temp1 = new Vector3().copy(dir).multiplyScalar(payload.tNear);
+    var temp2 = new Vector3().copy(orig)
+    var hitPoint = new Vector3().addVectors(temp1,temp2)
+    // var N; // normal
+    // var st; // st coordinates
+    const param = {
+      P: hitPoint,
+      N: [],
+      st: []
+    }
+    payload.hit_obj.getSurfaceProperties(param);
     switch (payload.hit_obj.materialType) {
-      case REFLECTION_AND_REFRACTION: {
-        var reflectionDirection = normalize(reflect(dir, N));
-        var refractionDirection = normalize(refract(dir, N, payload.hit_obj.ior));
-        var reflectionRayOrig = (dotProduct(reflectionDirection, N) < 0) ?
-          hitPoint - N * scene.epsilon :
-          hitPoint + N * scene.epsilon;
-        var refractionRayOrig = (dotProduct(refractionDirection, N) < 0) ?
-          hitPoint - N * scene.epsilon :
-          hitPoint + N * scene.epsilon;
-        var reflectionColor = castRay(reflectionRayOrig, reflectionDirection, scene, depth + 1);
-        var refractionColor = castRay(refractionRayOrig, refractionDirection, scene, depth + 1);
-        var kr = fresnel(dir, N, payload.hit_obj.ior);
-        hitColor = reflectionColor * kr + refractionColor * (1 - kr);
-        break;
-      }
-      case REFLECTION: {
-        var kr = fresnel(dir, N, payload.hit_obj.ior);
-        var reflectionDirection = reflect(dir, N);
-        var reflectionRayOrig = (dotProduct(reflectionDirection, N) < 0) ?
-          hitPoint + N * scene.epsilon :
-          hitPoint - N * scene.epsilon;
-        hitColor = castRay(reflectionRayOrig, reflectionDirection, scene, depth + 1) * kr;
-        break;
-      }
+      // case REFLECTION_AND_REFRACTION: {
+      //   var reflectionDirection = normalize(reflect(dir, N));
+      //   var refractionDirection = normalize(refract(dir, N, payload.hit_obj.ior));
+      //   var reflectionRayOrig = (dotProduct(reflectionDirection, N) < 0) ?
+      //     hitPoint - N * scene.epsilon :
+      //     hitPoint + N * scene.epsilon;
+      //   var refractionRayOrig = (dotProduct(refractionDirection, N) < 0) ?
+      //     hitPoint - N * scene.epsilon :
+      //     hitPoint + N * scene.epsilon;
+      //   var reflectionColor = castRay(reflectionRayOrig, reflectionDirection, scene, depth + 1);
+      //   var refractionColor = castRay(refractionRayOrig, refractionDirection, scene, depth + 1);
+      //   var kr = fresnel(dir, N, payload.hit_obj.ior);
+      //   hitColor = reflectionColor * kr + refractionColor * (1 - kr);
+      //   break;
+      // }
+      // case REFLECTION: {
+      //   var kr = fresnel(dir, N, payload.hit_obj.ior);
+      //   var reflectionDirection = reflect(dir, N);
+      //   var reflectionRayOrig = (dotProduct(reflectionDirection, N) < 0) ?
+      //     hitPoint + N * scene.epsilon :
+      //     hitPoint - N * scene.epsilon;
+      //   hitColor = castRay(reflectionRayOrig, reflectionDirection, scene, depth + 1) * kr;
+      //   break;
+      // }
       default: {
         // [comment]
         // We use the Phong illumation model int the default case. The phong model
         // is composed of a diffuse and a specular reflection component.
         // [/comment]
-        var lightAmt = 0, specularColor = 0;
-        var shadowPointOrig = (dotProduct(dir, N) < 0) ?
-          hitPoint + N * scene.epsilon :
-          hitPoint - N * scene.epsilon;
-        // [comment]
-        // Loop over all lights in the scene and sum their contribution up
-        // We also apply the lambert cosine law
-        // [/comment]
-        var light = scene.get_lights()
+        var lightAmt = new Vector3()
+        var specularColor = new Vector3()
+        var ret1 = hitPoint.add(param.N.multiplyScalar(scene.epsilon))
+        var ret2 = hitPoint.sub(param.N.multiplyScalar(scene.epsilon))
+        var shadowPointOrig = (new Vector3().dotProduct(dir, param.N) < 0) ? ret1:ret2
+        var light = scene.get_lights()[0]
         if (light) {
-          var lightDir = light.position.hitPoint;
+          var lightDir = light.position.clone().sub(hitPoint).normalize()
           // square of the distance between hitPoint and the light
-          var lightDistance2 = dotProduct(lightDir, lightDir);
-          lightDir = normalize(lightDir);
-          var LdotN = Math.max(0, dotProduct(lightDir, N));
+          var lightDistance2 = new Vector3().dotProduct(lightDir, lightDir);
+          // lightDir = normalize(lightDir);
+          var LdotN = Math.max(0, new Vector3().dotProduct(lightDir, param.N));
           // is the point in shadow, and is the nearest occluding object closer to the object than the light itself?
           var shadow_res = trace(shadowPointOrig, lightDir, scene.get_objects());
           var inShadow = shadow_res && (shadow_res.tNear * shadow_res.tNear < lightDistance2);
 
-          lightAmt += inShadow ? 0 : light.intensity * LdotN;
-          var reflectionDirection = reflect(-lightDir, N);
+          let retTTT = inShadow ? 0 : light.intensity * LdotN;
+          if (1) console.error(light.intensity * LdotN);
 
-          specularColor += powf(Math.max(0, -dotProduct(reflectionDirection, dir)),
-            payload.hit_obj.specularExponent) * light.intensity;
+          lightAmt.addScalar(retTTT)
+          var reflectionDirection = reflect(new Vector3().copy(lightDir).negate(), param.N);
+
+          const ttt = Math.max(0, -new Vector3().dotProduct(reflectionDirection, dir))
+          let ret = Math.pow(ttt, payload.hit_obj.specularExponent) * light.intensity;
+          specularColor.addScalar(ret)
         }
 
-        hitColor = lightAmt * payload.hit_obj.evalDiffuseColor(st) * payload.hit_obj.Kd + specularColor *
-          payload.hit_obj.Ks;
+        const obj = payload.hit_obj
+        const objColor = obj.evalDiffuseColor(obj.Kd)
+        //console.error(lightAmt);
+        let ret1Color = lightAmt.multiply(objColor)
+        let ret2Color = specularColor.multiplyScalar(obj.Ks)
+        hitColor = ret1Color + ret2Color
         break;
       }
     }
@@ -150,7 +172,29 @@ class hit_payload {
 };
 
 export default class Renderer {
-  constructor(scene) {
+  constructor() {
+
+  }
+
+  Render(scene) {
+    const framebuffer = []
+    var scale = Math.tan(deg2rad(scene.fov * 0.5));
+    var imageAspectRatio = scene.width / scene.height;
+    var eye_pos = new Vector3()
+
+    var m = 0;
+    for (var j = 0; j < scene.height; ++j) {
+      for (var i = 0; i < scene.width; ++i) {
+        var x;
+        var y;
+        x = imageAspectRatio * (2 * (i + 0.5) / scene.width - 1);
+        y = 1 - (2 * (j + 0.5 ) / scene.height);
+        var dir = new Vector3(x, y, -1).normalize()
+        framebuffer[m++] = castRay(eye_pos, dir, scene, 0);
+      }
+      // UpdateProgress(j / (var) scene.height);
+    }
+    return framebuffer
 
   }
 }

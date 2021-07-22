@@ -422,9 +422,11 @@ class Vector3 {
 	}
 
 	dot( v ) {
-
 		return this.x * v.x + this.y * v.y + this.z * v.z;
+	}
 
+	dotProduct(u, v) {
+		return u.x * v.x + u.y * v.y + u.z * v.z;
 	}
 
 	// TODO lengthSquared?
