@@ -1,0 +1,21 @@
+import { Vector3 } from './Vector3.js'
+
+export default class Scene {
+  constructor(w, h) {
+    this.objects = []
+    this.lights = []
+    this.width = w||1280;
+    this.height = h||960;
+    this.fov = 90;
+    this.backgroundColor = new Vector3(0.235294, 0.67451, 0.843137);
+    this.maxDepth = 5;
+    this.epsilon = 0.00001;
+  }
+
+  AddObj(object) {
+    this.objects.push(object)
+  }
+  AddLight(light) {
+    this.lights.push(light)
+  }
+}
