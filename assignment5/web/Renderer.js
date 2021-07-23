@@ -7,8 +7,8 @@ function deg2rad(deg) {
 }
 
 // Compute reflection direction
-function reflect(I, N) {
-  // return I - 2 * temp * N;
+export function reflect(I, N) {
+  // return I - 2 * I * N;
   const temp = new Vector3().dotProduct(I, N)
   const n = N.multiplyScalar(2*temp)
 
@@ -43,6 +43,9 @@ function fresnel( I, N,ior) {
   var etai = 1, etat = ior;
   if (cosi > 0) {
     // std:: swap(etai, etat);
+    let temp = etai
+    etai = etat
+    etat = temp
   }
   // Compute sini using Snell's law
   var sint = etai / etat * Math.sqrt(Math.max(0, 1 - cosi * cosi));
@@ -124,22 +127,23 @@ function castRay( orig, dir, scene, depth) {
         break;
       }
       case MaterialType.REFLECTION: {
-        var kr = 0.5//fresnel(dir.clone(), param.N.clone(), payload.hit_obj.ior);
+        var kr = fresnel(dir.clone(), param.N.clone(), payload.hit_obj.ior);
 
-          var ret1 = hitPoint.clone().add(param.N.clone().multiplyScalar(scene.epsilon))
+        var ret1 = hitPoint.clone().add(param.N.clone().multiplyScalar(scene.epsilon))
         var ret2 = hitPoint.clone().sub(param.N.clone().multiplyScalar(scene.epsilon))
 
         var reflectionDirection = reflect(dir.clone(), param.N.clone());
-        let ttt = new Vector3().dotProduct(reflectionDirection, param.N.clone())
+        let ttt = new Vector3().dotProduct(reflectionDirection.clone(), param.N.clone())
           console.error(ttt);
 
           // if()
-        // var reflectionRayOrig = () < 0) ?
-        //   ret1 :
-        //   ret2;
+        var reflectionRayOrig = ttt < 0 ? ret1 : ret2
+        // console.error(hitPoint);
+
         // let aaa = castRay(reflectionRayOrig, reflectionDirection, scene, depth + 1)
-        hitColor = new Vector3(1,0,0)//aaa.multiplyScalar(kr)
-        console.erro//r(aaa);
+        // hitColor = aaa.multiplyScalar(kr)
+        console.error();
+
 
         break;
       }
@@ -199,7 +203,7 @@ class hit_payload {
   }
 };
 
-export default class Renderer {
+export class Renderer {
   constructor() {
 
   }

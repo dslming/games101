@@ -2,7 +2,7 @@ import Scene from './Scene.js'
 import Sphere from './Sphere.js'
 import { Vector3 } from './Vector3.js'
 import { MaterialType } from './global.js'
-import Renderer from './Renderer.js'
+import { Renderer, reflect } from './Renderer.js'
 import CanvasTool from './CanvasTool.js'
 import Light from './Light.js'
 export default class App {
@@ -11,12 +11,12 @@ export default class App {
      const w = 32
      const h = w
     let scene = new Scene(w, h)
-    let s1 = new Sphere(new Vector3(0, 0, -10), 2)
+    let s1 = new Sphere(new Vector3(0, 0, -8), 1)
     // s1.materialType = MaterialType.REFLECTION
     s1.diffuseColor = new Vector3(0.6, 0.7, 0.8);
-    scene.AddObj(s1)
+    // scene.AddObj(s1)
 
-    let s2 = new Sphere(new Vector3(2, 1.5, -8), 2.5)
+    let s2 = new Sphere(new Vector3(0, -1.5, -10), 1)
     s2.materialType = MaterialType.REFLECTION
     s2.diffuseColor = new Vector3(1, 0.7, 0.8);
     // s2.diffuseColor = MaterialType.REFLECTION_AND_REFRACTION
@@ -61,6 +61,11 @@ export default class App {
     this.w = w
     this.h = h
     this.update()
+
+    // let ret = new Vector3(1, 0, 0).reflect(new Vector3(0, -1, 0))
+    // // let ret = reflect(new Vector3(-1, 1, 0), new Vector3(0, 1, 0))
+    // console.error(ret);
+
   }
 
   get lightPos() {
