@@ -11,16 +11,16 @@ function solveQuadratic(a, b, c, options) {
   if (discr < 0)
     return false;
   else if (discr == 0)
-    options.x0 = options.x1 = -0.5 * b / a;
+    options.t0 = options.t1 = -0.5 * b / a;
   else {
     var q = (b > 0) ? -0.5 * (b + Math.sqrt(discr)) : -0.5 * (b - Math.sqrt(discr));
-    options.x0 = q / a;
-    options.x1 = c / q;
+    options.t0 = q / a;
+    options.t1 = c / q;
   }
-  if (options.x0 > options.x1) {
-    var temp = options.x0
-    options.x0 = options.x1
-    options.x1 = temp
+  if (options.t0 > options.t1) {
+    var temp = options.t0
+    options.t0 = options.t1
+    options.t1 = temp
   }
   return true;
 }
