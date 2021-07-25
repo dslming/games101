@@ -7,9 +7,10 @@ export default class CanvasTool {
     d[(y * w + x) * 4 + 3] = color[3]
   }
 
-  static setPixelByIndex({ index, color, data, width }) {
-     let rows = Math.floor(index / width)
-     let columns = Math.max(index - rows * width, 0);
-    CanvasTool.setPixel({ x: rows, y: columns, color, d: data, width })
+  static setPixelByIndex({ index, color, data }) {
+     data[index * 4 + 0] = color[0]
+     data[index * 4 + 1] = color[1]
+     data[index * 4 + 2] = color[2]
+     data[index * 4 + 3] = color[3]
   }
 }

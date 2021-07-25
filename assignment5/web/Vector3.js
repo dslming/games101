@@ -485,16 +485,16 @@ class Vector3 {
 
 		if ( w !== undefined ) {
 
-			console.warn( 'THREE.Vector3: .cross() now only accepts one argument. Use .crossVectors( a, b ) instead.' );
-			return this.crossVectors( v, w );
+			console.warn( 'THREE.Vector3: .cross() now only accepts one argument. Use .crossProduct( a, b ) instead.' );
+			return this.crossProduct( v, w );
 
 		}
 
-		return this.crossVectors( this, v );
+		return this.crossProduct( this, v );
 
 	}
 
-	crossVectors( a, b ) {
+	crossProduct( a, b ) {
 
 		const ax = a.x, ay = a.y, az = a.z;
 		const bx = b.x, by = b.y, bz = b.z;

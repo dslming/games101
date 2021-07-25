@@ -2,6 +2,9 @@ import { M_PI, kInfinity } from './global.js'
 import { Vector3 } from './Vector3.js';
 import { MaterialType } from './global.js'
 import * as MathUtils from './MathUtils.js'
+let only = false
+let temp = 0
+
 function deg2rad(deg) {
   return deg * M_PI / 180.0;
 }
@@ -101,7 +104,9 @@ function castRay( orig, dir, scene, depth) {
     const param = {
       P: hitPoint,
       N: [],
-      st: []
+      st: [],
+      uv: payload.uv,
+      index: payload.index,
     }
     payload.hit_obj.getSurfaceProperties(param);
     switch (payload.hit_obj.materialType) {
@@ -134,15 +139,14 @@ function castRay( orig, dir, scene, depth) {
 
         var reflectionDirection = reflect(dir.clone(), param.N.clone());
         let ttt = new Vector3().dotProduct(reflectionDirection.clone(), param.N.clone())
-          console.error(ttt);
+          // console.error(ttt);
 
           // if()
         var reflectionRayOrig = ttt < 0 ? ret1 : ret2
         // console.error(hitPoint);
 
-        // let aaa = castRay(reflectionRayOrig, reflectionDirection, scene, depth + 1)
-        // hitColor = aaa.multiplyScalar(kr)
-        console.error();
+        let aaa = castRay(reflectionRayOrig, reflectionDirection, scene, depth + 1)
+        hitColor = aaa.multiplyScalar(kr)
 
 
         break;
@@ -168,7 +172,7 @@ function castRay( orig, dir, scene, depth) {
           var shadow_res = trace(shadowPointOrig, lightDir, scene.get_objects());
           var inShadow = false
           if (shadow_res && shadow_res.tNear * shadow_res.tNear < lightDistance2) {
-            inShadow = true
+            // inShadow = true
           }
 
           let retTTT = light.intensity * LdotN;
@@ -182,10 +186,10 @@ function castRay( orig, dir, scene, depth) {
         }
 
         const obj = payload.hit_obj
-        const objColor = obj.evalDiffuseColor(obj.Kd)
+        const objColor = obj.evalDiffuseColor()
         let ret1Color = lightAmt.multiply(objColor)
         let ret2Color = specularColor.multiplyScalar(obj.Ks)
-        hitColor = ret2Color.add(ret1Color)
+        hitColor =  ret2Color.add(ret1Color)
         break;
       }
     }
@@ -193,15 +197,6 @@ function castRay( orig, dir, scene, depth) {
 
   return hitColor;
 }
-
-class hit_payload {
-  constructor() {
-    this.tNear;
-    this.index;
-    this.uv;
-    this.hit_obj;
-  }
-};
 
 export class Renderer {
   constructor() {

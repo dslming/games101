@@ -472,6 +472,4 @@ class Vector2 {
 
 }
 
-Vector2.prototype.isVector2 = true;
-
 export { Vector2 };
