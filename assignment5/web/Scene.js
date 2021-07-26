@@ -7,8 +7,8 @@ export default class Scene {
     this.width = w||1280;
     this.height = h||960;
     this.fov = 90;
-    // this.backgroundColor = new Vector3(0.235294, 0.67451, 0.843137);
-    this.backgroundColor = new Vector3(1, 1, 1);
+    this.backgroundColor = new Vector3(0.235294, 0.67451, 0.843137);
+    // this.backgroundColor = new Vector3(1, 1, 1);
     this.maxDepth = 5;
     this.epsilon = 0.00001;
   }

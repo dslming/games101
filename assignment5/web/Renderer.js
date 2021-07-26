@@ -17,7 +17,7 @@ export function reflect(I, N) {
 
   // const a = N.multiplyScalar(2 * temp)
 
-  return I.sub(n);
+  return I.sub(n).normalize();
 }
 
 function refract(I, N, ior) {
@@ -41,11 +41,12 @@ function refract(I, N, ior) {
   return k < 0 ? 0 : a1.add(a3)
 }
 
+// 计算菲涅耳方程
 function fresnel( I, N,ior) {
   var cosi = MathUtils.clamp(new Vector3().dotProduct(I, N),- 1, 1);
-  var etai = 1, etat = ior;
+  var etai = 1
+  var etat = ior;
   if (cosi > 0) {
-    // std:: swap(etai, etat);
     let temp = etai
     etai = etat
     etat = temp
@@ -62,6 +63,35 @@ function fresnel( I, N,ior) {
     var Rp = ((etai * cosi) - (etat * cost)) / ((etai * cosi) + (etat * cost));
     return (Rs * Rs + Rp * Rp) / 2;
   }
+}
+
+/**
+ * 计算折射方向
+ */
+function getRefraction(i, n, r) {
+  if (!i || !n || !r) {
+    console.error("缺少参数...")
+    return
+  }
+
+  i.normalize()
+  n.normalize()
+
+  if (i.clone().dot(n) < 0) {
+    n.negate()
+  }
+
+  var cosi = i.clone().dot(n)
+  var cosj2 = 1 - (1 - cosi * cosi) / (r * r)
+  var cosj = Math.sqrt(cosj2)
+  var thetai = Math.acos(cosi)
+  var thetaj = Math.acos(cosj)
+  var thetak = thetai - thetaj
+  var cosk = Math.cos(thetak)
+
+  var x = (cosj - cosi * cosk) / (1 - cosi * cosi)
+  var y = (cosk - cosi * cosj) / (1 - cosi * cosi)
+  return n.multiplyScalar(x).add(i.multiplyScalar(y))
 }
 
 function trace( orig, dir,objects) {
@@ -111,44 +141,53 @@ function castRay( orig, dir, scene, depth) {
     payload.hit_obj.getSurfaceProperties(param);
     switch (payload.hit_obj.materialType) {
       case MaterialType.REFLECTION_AND_REFRACTION: {
-        var reflectionDirection = reflect(dir.clone(), param.N.clone()).normalize()
-        var refractionDirection = refract(dir.clone(), param.N.clone(), payload.hit_obj.ior).normalize();
         var ret1 = hitPoint.clone().add(param.N.clone().multiplyScalar(scene.epsilon))
         var ret2 = hitPoint.clone().sub(param.N.clone().multiplyScalar(scene.epsilon))
-        var reflectionRayOrig = (new Vector3().dotProduct(reflectionDirection, param.N) < 0) ?
-          ret2 :
-          ret1;
-        var refractionRayOrig = (new Vector3().dotProduct(refractionDirection, param.N) < 0) ?
-          ret2 :
-          ret1;
+
+        // 反射
+        var reflectionDirection = reflect(dir.clone(), param.N.clone()).normalize()
+        var reflectionRayOrig = (new Vector3().dotProduct(reflectionDirection, param.N) < 0) ?ret2 : ret1;
         var reflectionColor = castRay(reflectionRayOrig.clone(), reflectionDirection.clone(), scene, depth + 1);
+        // hitColor = reflectionColor //.add(r2)
+
+        // 折射
+        var refractionDirection = refract(dir.clone(), param.N.clone(), payload.hit_obj.ior).normalize();
+        var refractionRayOrig = (new Vector3().dotProduct(refractionDirection, param.N) < 0) ? ret2 : ret1;
         var refractionColor = castRay(refractionRayOrig.clone(), refractionDirection.clone(), scene, depth + 1);
+        // hitColor = refractionColor //.add(r2)
+
         var kr = fresnel(dir.clone(), param.N, payload.hit_obj.ior);
-        let r1 = reflectionColor.multiplyScalar(kr)
-        let r2 = refractionColor.multiplyScalar(1-kr)
-        hitColor = r1.add(r2)
+        // if (kr > 0.2) {
+        //   // hitColor = new Vector3(1, 0, 0)
+        //   hitColor = reflectionColor.clone().multiplyScalar(0.2)
+        // } else {
+        //   hitColor = new Vector3(0, 1, 0)
+        //   hitColor= refractionColor.clone().multiplyScalar(1)
+        // }
+        let aaa = reflectionColor.clone().multiplyScalar(kr)
+        let bbb = refractionColor.clone().multiplyScalar(1 - kr)
+        hitColor = aaa.add(bbb)
+        // hitColor = reflectionColor.add(refractionColor)
         // console.error(reflectionColor);
 
         break;
       }
       case MaterialType.REFLECTION: {
-        // var kr = fresnel(dir.clone(), param.N.clone(), payload.hit_obj.ior);
+        var kr = fresnel(dir.clone(), param.N.clone(), payload.hit_obj.ior);
 
         var ret1 = hitPoint.clone().add(param.N.clone().multiplyScalar(scene.epsilon))
         var ret2 = hitPoint.clone().sub(param.N.clone().multiplyScalar(scene.epsilon))
 
         var reflectionDirection = reflect(dir.clone(), param.N.clone());
-        let ttt = new Vector3().dotProduct(reflectionDirection.clone(), param.N.clone())
+        let ttt = new Vector3().dotProduct(reflectionDirection, param.N)
           // console.error(ttt);
-
+        if (ttt < 0) {
+          debugger
+        }
           // if()
-        var reflectionRayOrig = ttt < 0 ? ret1 : ret1
-        // var reflectionRayOrig = hitPoint.clone()
-        // console.error(hitPoint);
-
-        let aaa = castRay(reflectionRayOrig, reflectionDirection, scene, depth + 1)
+        var reflectionRayOrig = ttt < 0 ? ret2 : ret1
+        const aaa = castRay(reflectionRayOrig, reflectionDirection, scene, depth + 1)
         hitColor = aaa.multiplyScalar(kr)
-
 
         break;
       }

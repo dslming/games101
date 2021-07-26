@@ -13,7 +13,7 @@ export default class App {
      const w = 512
      const h = w
     let scene = new Scene(w, h)
-    let s1 = new Sphere(new Vector3(-3, 0, -7), 2)
+    let s1 = new Sphere(new Vector3(-1, 0, -12), 2)
     s1.name = "s1"
     s1.materialType = MaterialType.DIFFUSE_AND_GLOSSY
     s1.diffuseColor = new Vector3(0.6, 0.7, 0.8);
@@ -21,12 +21,12 @@ export default class App {
 
     let s2 = new Sphere(new Vector3(0.5, -0.5, -8), 1.5)
     s2.name = "s2"
-    s2.materialType = MaterialType.REFLECTION
+    s2.materialType = MaterialType.REFLECTION_AND_REFRACTION
     s2.diffuseColor = new Vector3(1, 0.7, 0.8);
     s2.ior = 1.5
     scene.AddObj(s2)
 
-    let l1 = new Light(new Vector3(-20, 70, 20), 1)
+    let l1 = new Light(new Vector3(20, 20, 20), 1)
     scene.AddLight(l1)
     this.light = l1
 
