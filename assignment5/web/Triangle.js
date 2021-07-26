@@ -1,6 +1,8 @@
 import Object from './Object.js'
 import {Vector3} from './Vector3.js'
 import { Vector2 } from './Vector2.js'
+
+// Moller-Trumbore
 function rayTriangleIntersect(v0, v1, v2, orig, dir, param) {
   var e1 = v1.sub(v0);
   var e2 = v2.sub(v0);
@@ -15,7 +17,7 @@ function rayTriangleIntersect(v0, v1, v2, orig, dir, param) {
 
   if (t > 0 && b1 > 0 && b2 > 0 && ((1 - b1 - b2) > 0)) {
     //std::cout << "inside triangle"<<'\n';
-    param.tnear = t;
+    param.tNear = t;
     param.uv = {
       x: b1,
       y: b2
@@ -28,6 +30,7 @@ function rayTriangleIntersect(v0, v1, v2, orig, dir, param) {
 export default class Triangle extends Object {
   constructor(verts, vertsIndex, numTris,st) {
     super()
+    this.name = "plane"
     this.numTriangles
     this.vertices = []
     this.vertexIndex = []
@@ -68,12 +71,12 @@ export default class Triangle extends Object {
       const v2 = this.getVertsByIndex(this.vertexIndex[k * 3 + 2]);
       // var t, u, v;
       const obj = {
-        tnear: 0,
+        tNear: 0,
         uv: {},
       }
       let ret = rayTriangleIntersect(v0, v1, v2, orig, dir, obj)
-      if (ret && obj.tnear < tnear) {
-        param.tNearK = obj.tnear;
+      if (ret && obj.tNear < tnear) {
+        param.tNearK = obj.tNear;
         param.uvK = obj.uv
         param.indexK = k;
         intersect |= true;

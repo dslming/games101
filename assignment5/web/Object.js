@@ -9,6 +9,7 @@ export default class Object {
     this.Ks = 0.2
     this.diffuseColor = new Vector3(0.2,0.2,0.2)
     this.specularExponent = 25
+    this.name = "object"
   }
   intersect() {
     //virtual

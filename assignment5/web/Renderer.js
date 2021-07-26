@@ -93,7 +93,7 @@ function castRay( orig, dir, scene, depth) {
   }
 
   var hitColor = scene.backgroundColor;
-  var payload = trace(orig, dir, scene.get_objects());
+  var payload = trace(orig.clone(), dir.clone(), scene.get_objects());
 
   if (payload) {
     var temp1 = new Vector3().copy(dir).multiplyScalar(payload.tNear);
@@ -112,27 +112,27 @@ function castRay( orig, dir, scene, depth) {
     switch (payload.hit_obj.materialType) {
       case MaterialType.REFLECTION_AND_REFRACTION: {
         var reflectionDirection = reflect(dir.clone(), param.N.clone()).normalize()
-        // var refractionDirection = refract(dir.clone(), param.N.clone(), payload.hit_obj.ior).normalize();
+        var refractionDirection = refract(dir.clone(), param.N.clone(), payload.hit_obj.ior).normalize();
         var ret1 = hitPoint.clone().add(param.N.clone().multiplyScalar(scene.epsilon))
         var ret2 = hitPoint.clone().sub(param.N.clone().multiplyScalar(scene.epsilon))
         var reflectionRayOrig = (new Vector3().dotProduct(reflectionDirection, param.N) < 0) ?
           ret2 :
           ret1;
-        // var refractionRayOrig = (new Vector3().dotProduct(refractionDirection, param.N) < 0) ?
-        //   ret2 :
-        //   ret1;
+        var refractionRayOrig = (new Vector3().dotProduct(refractionDirection, param.N) < 0) ?
+          ret2 :
+          ret1;
         var reflectionColor = castRay(reflectionRayOrig.clone(), reflectionDirection.clone(), scene, depth + 1);
-        // var refractionColor = castRay(refractionRayOrig.clone(), refractionDirection.clone(), scene, depth + 1);
-        var kr = fresnel(dir, param.N, payload.hit_obj.ior);
+        var refractionColor = castRay(refractionRayOrig.clone(), refractionDirection.clone(), scene, depth + 1);
+        var kr = fresnel(dir.clone(), param.N, payload.hit_obj.ior);
         let r1 = reflectionColor.multiplyScalar(kr)
-        // let r2 = refractionColor.multiplyScalar(1-kr)
-        hitColor = r1;//r1.add(r2)
+        let r2 = refractionColor.multiplyScalar(1-kr)
+        hitColor = r1.add(r2)
         // console.error(reflectionColor);
 
         break;
       }
       case MaterialType.REFLECTION: {
-        var kr = fresnel(dir.clone(), param.N.clone(), payload.hit_obj.ior);
+        // var kr = fresnel(dir.clone(), param.N.clone(), payload.hit_obj.ior);
 
         var ret1 = hitPoint.clone().add(param.N.clone().multiplyScalar(scene.epsilon))
         var ret2 = hitPoint.clone().sub(param.N.clone().multiplyScalar(scene.epsilon))
@@ -142,7 +142,8 @@ function castRay( orig, dir, scene, depth) {
           // console.error(ttt);
 
           // if()
-        var reflectionRayOrig = ttt < 0 ? ret1 : ret2
+        var reflectionRayOrig = ttt < 0 ? ret1 : ret1
+        // var reflectionRayOrig = hitPoint.clone()
         // console.error(hitPoint);
 
         let aaa = castRay(reflectionRayOrig, reflectionDirection, scene, depth + 1)
@@ -152,10 +153,6 @@ function castRay( orig, dir, scene, depth) {
         break;
       }
       default: {
-        // [comment]
-        // We use the Phong illumation model int the default case. The phong model
-        // is composed of a diffuse and a specular reflection component.
-        // [/comment]
         var lightAmt = new Vector3()
         var specularColor = new Vector3()
         var ret1 = hitPoint.clone().add(param.N.clone().multiplyScalar(scene.epsilon))
@@ -163,16 +160,20 @@ function castRay( orig, dir, scene, depth) {
         var shadowPointOrig = (new Vector3().dotProduct(dir, param.N) < 0) ? ret1:ret2
         var light = scene.get_lights()[0]
         if (light) {
-          var lightDir = light.position.clone().sub(hitPoint).normalize()
+          var lightDir = light.position.clone().sub(hitPoint)
           // square of the distance between hitPoint and the light
           var lightDistance2 = new Vector3().dotProduct(lightDir, lightDir);
+          lightDir = lightDir.normalize()
           var LdotN = Math.max(0, new Vector3().dotProduct(lightDir, param.N));
 
           // is the point in shadow, and is the nearest occluding object closer to the object than the light itself?
           var shadow_res = trace(shadowPointOrig, lightDir, scene.get_objects());
           var inShadow = false
           if (shadow_res && shadow_res.tNear * shadow_res.tNear < lightDistance2) {
-            // inShadow = true
+            inShadow = true
+          }
+          if (payload.hit_obj.name == "plane") {
+            // debugger
           }
 
           let retTTT = light.intensity * LdotN;
@@ -207,7 +208,7 @@ export class Renderer {
     const framebuffer = []
     var scale = Math.tan(deg2rad(scene.fov * 0.5));
     var imageAspectRatio = scene.width / scene.height;
-    var eye_pos = new Vector3()
+    var eye_pos = new Vector3(0,0,0)
 
     var m = 0;
     for (var j = 0; j < scene.height; ++j) {

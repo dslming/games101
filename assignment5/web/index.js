@@ -10,21 +10,23 @@ import Triangle from './Triangle.js'
 export default class App {
   constructor() {
     window.lm = this
-     const w = 800
+     const w = 512
      const h = w
     let scene = new Scene(w, h)
-    let s1 = new Sphere(new Vector3(-3, 0, -8), 1)
-    // s1.materialType = MaterialType.REFLECTION
+    let s1 = new Sphere(new Vector3(-3, 0, -7), 2)
+    s1.name = "s1"
+    s1.materialType = MaterialType.DIFFUSE_AND_GLOSSY
     s1.diffuseColor = new Vector3(0.6, 0.7, 0.8);
     scene.AddObj(s1)
 
-    let s2 = new Sphere(new Vector3(0, -0.5, -8), 1)
+    let s2 = new Sphere(new Vector3(0.5, -0.5, -8), 1.5)
+    s2.name = "s2"
     s2.materialType = MaterialType.REFLECTION
     s2.diffuseColor = new Vector3(1, 0.7, 0.8);
     s2.ior = 1.5
-    // scene.AddObj(s2)
+    scene.AddObj(s2)
 
-    let l1 = new Light(new Vector3(0, 10, 10), 1)
+    let l1 = new Light(new Vector3(-20, 70, 20), 1)
     scene.AddLight(l1)
     this.light = l1
 
@@ -62,11 +64,6 @@ export default class App {
     this.w = w
     this.h = h
     this.update()
-
-    // let ret = new Vector3(1, 0, 0).reflect(new Vector3(0, -1, 0))
-    // // let ret = reflect(new Vector3(-1, 1, 0), new Vector3(0, 1, 0))
-    // console.error(ret);
-
   }
 
   get lightPos() {
