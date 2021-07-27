@@ -27,7 +27,10 @@ class Bounds3
         pMax = Vector3f(fmax(p1.x, p2.x), fmax(p1.y, p2.y), fmax(p1.z, p2.z));
     }
 
+    // 对角线
     Vector3f Diagonal() const { return pMax - pMin; }
+
+    // 最大范围
     int maxExtent() const
     {
         Vector3f d = Diagonal();
@@ -39,12 +42,14 @@ class Bounds3
             return 2;
     }
 
+    // 表面积
     double SurfaceArea() const
     {
         Vector3f d = Diagonal();
         return 2 * (d.x * d.y + d.x * d.z + d.y * d.z);
     }
 
+    // 质心
     Vector3f Centroid() { return 0.5 * pMin + 0.5 * pMax; }
     Bounds3 Intersect(const Bounds3& b)
     {
@@ -66,6 +71,7 @@ class Bounds3
         return o;
     }
 
+    // 重叠
     bool Overlaps(const Bounds3& b1, const Bounds3& b2)
     {
         bool x = (b1.pMax.x >= b2.pMin.x) && (b1.pMin.x <= b2.pMax.x);
@@ -88,8 +94,7 @@ class Bounds3
                            const std::array<int, 3>& dirisNeg) const;
 };
 
-
-
+//判断包围盒 BoundingBox 与光线是否相交
 inline bool Bounds3::IntersectP(const Ray& ray, const Vector3f& invDir,
                                 const std::array<int, 3>& dirIsNeg) const
 {
@@ -112,13 +117,14 @@ inline bool Bounds3::IntersectP(const Ray& ray, const Vector3f& invDir,
     t2 = (pMax.z - ray.origin.z) * invDir.z;
     double tzmin = (dirIsNeg[2]>0)?t1:t2;
     double tzmax = (dirIsNeg[2]>0)?t2:t1;
-    
+
     if(std::max(std::max(txmin,tymin),tzmin) < std::min(std::min(txmax,tymax),tzmax) && std::min(std::min(txmax,tymax),tzmax))
     return true;
     else
     return false;
 }
 
+// 合并
 inline Bounds3 Union(const Bounds3& b1, const Bounds3& b2)
 {
     Bounds3 ret;
