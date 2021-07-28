@@ -5,7 +5,7 @@ import { MaterialType } from './global.js'
 import { Renderer, reflect } from './Renderer.js'
 import CanvasTool from './CanvasTool.js'
 import Light from './Light.js'
-import Triangle from './Triangle.js'
+import MeshTriangle from './Triangle.js'
 import B from './Bounds3.js'
 
 export default class App {
@@ -14,37 +14,37 @@ export default class App {
      const w = 512
      const h = w
     let scene = new Scene(w, h)
-    let s1 = new Sphere(new Vector3(-1, 0, -12), 2)
-    s1.name = "s1"
-    s1.materialType = MaterialType.DIFFUSE_AND_GLOSSY
-    s1.diffuseColor = new Vector3(0.6, 0.7, 0.8);
-    scene.AddObj(s1)
+    // let s1 = new Sphere(new Vector3(-1, 0, -12), 2)
+    // s1.name = "s1"
+    // s1.materialType = MaterialType.DIFFUSE_AND_GLOSSY
+    // s1.diffuseColor = new Vector3(0.6, 0.7, 0.8);
+    // scene.AddObj(s1)
 
-    let s2 = new Sphere(new Vector3(0.5, -0.5, -8), 1.5)
-    s2.name = "s2"
-    s2.materialType = MaterialType.REFLECTION_AND_REFRACTION
-    s2.diffuseColor = new Vector3(1, 0.7, 0.8);
-    s2.ior = 1.5
+    // let s2 = new Sphere(new Vector3(0.5, -0.5, -8), 1.5)
+    // s2.name = "s2"
+    // s2.materialType = MaterialType.REFLECTION_AND_REFRACTION
+    // s2.diffuseColor = new Vector3(1, 0.7, 0.8);
+    // s2.ior = 1.5
     // scene.AddObj(s2)
 
     let l1 = new Light(new Vector3(20, 20, 20), 1)
     scene.AddLight(l1)
     this.light = l1
 
-    var verts = [
-      -5, -3, -6,  //[0]
-      5, -3, -6,   //[1]
-      5, -3, -16,  //[2]
-      -5, -3, -16];//[3]
-    var vertIndex = [
-      0, 1, 3,
-      1,2, 3
-    ]
-    var st =  [  0, 0 ,  1, 0 ,  1, 1 ,  0, 1 ];
+    // var verts = [
+    //   -5, -3, -6,  //[0]
+    //   5, -3, -6,   //[1]
+    //   5, -3, -16,  //[2]
+    //   -5, -3, -16];//[3]
+    // var vertIndex = [
+    //   0, 1, 3,
+    //   1,2, 3
+    // ]
+    // var st =  [  0, 0 ,  1, 0 ,  1, 1 ,  0, 1 ];
 
-    let t = new Triangle(verts, vertIndex, 2, st)
-    t.diffuseColor = new Vector3(0.5, 0.8, 0.5);
-    scene.AddObj(t)
+    // let t = new Triangle(verts, vertIndex, 2, st)
+    // t.diffuseColor = new Vector3(0.5, 0.8, 0.5);
+    // scene.AddObj(t)
 
     let renderer = new Renderer()
     this.scene = scene

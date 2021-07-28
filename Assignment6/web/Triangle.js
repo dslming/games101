@@ -27,7 +27,7 @@ function rayTriangleIntersect(v0, v1, v2, orig, dir, param) {
   return false;
 }
 
-export default class Triangle extends Object {
+export default class MeshTriangle extends Object {
   constructor(verts, vertsIndex, numTris,st) {
     super()
     this.name = "plane"
