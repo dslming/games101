@@ -6,6 +6,7 @@ import { Renderer, reflect } from './Renderer.js'
 import CanvasTool from './CanvasTool.js'
 import Light from './Light.js'
 import Triangle from './Triangle.js'
+import B from './Bounds3.js'
 
 export default class App {
   constructor() {
