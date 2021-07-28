@@ -1,9 +1,7 @@
-import { M_PI } from './global.js'
+import { M_PI} from './global.js'
 import { Vector3 } from './Vector3.js';
 import { MaterialType } from './global.js'
 import * as MathUtils from './MathUtils.js'
-import { Matrix4 } from './Matrix4.js'
-
 let only = false
 let temp = 0
 
@@ -15,7 +13,7 @@ function deg2rad(deg) {
 export function reflect(I, N) {
   // return I - 2 * I * N;
   const temp = new Vector3().dotProduct(I, N)
-  const n = N.multiplyScalar(2*temp)
+  const n = N.multiplyScalar(2 * temp)
 
   // const a = N.multiplyScalar(2 * temp)
 
@@ -23,7 +21,7 @@ export function reflect(I, N) {
 }
 
 function refract(I, N, ior) {
-  var cosi = MathUtils.clamp(new Vector3().dotProduct(I, N) ,- 1, 1);
+  var cosi = MathUtils.clamp(new Vector3().dotProduct(I, N), -1, 1);
   var etai = 1
   var etat = ior;
   var n = N.clone();
@@ -44,8 +42,8 @@ function refract(I, N, ior) {
 }
 
 // 计算菲涅耳方程
-function fresnel( I, N,ior) {
-  var cosi = MathUtils.clamp(new Vector3().dotProduct(I, N),- 1, 1);
+function fresnel(I, N, ior) {
+  var cosi = MathUtils.clamp(new Vector3().dotProduct(I, N), -1, 1);
   var etai = 1
   var etat = ior;
   if (cosi > 0) {
@@ -96,7 +94,7 @@ function getRefraction(i, n, r) {
   return n.multiplyScalar(x).add(i.multiplyScalar(y))
 }
 
-function trace( orig, dir,objects) {
+function trace(orig, dir, objects) {
   let tNear = Infinity;
   var payload = null
   for (let i = 0; i < objects.length; i++) {
@@ -119,7 +117,7 @@ function trace( orig, dir,objects) {
   return payload;
 }
 
-function castRay( orig, dir, scene, depth) {
+function castRay(orig, dir, scene, depth) {
   if (depth > scene.maxDepth) {
     return new Vector3(0.0, 0.0, 0.0);
   }
@@ -130,7 +128,7 @@ function castRay( orig, dir, scene, depth) {
   if (payload) {
     var temp1 = new Vector3().copy(dir).multiplyScalar(payload.tNear);
     var temp2 = new Vector3().copy(orig)
-    var hitPoint = new Vector3().addVectors(temp1,temp2)
+    var hitPoint = new Vector3().addVectors(temp1, temp2)
     // var N; // normal
     // var st; // st coordinates
     const param = {
@@ -148,7 +146,7 @@ function castRay( orig, dir, scene, depth) {
 
         // 反射
         var reflectionDirection = reflect(dir.clone(), param.N.clone()).normalize()
-        var reflectionRayOrig = (new Vector3().dotProduct(reflectionDirection, param.N) < 0) ?ret2 : ret1;
+        var reflectionRayOrig = (new Vector3().dotProduct(reflectionDirection, param.N) < 0) ? ret2 : ret1;
         var reflectionColor = castRay(reflectionRayOrig.clone(), reflectionDirection.clone(), scene, depth + 1);
         // hitColor = reflectionColor //.add(r2)
 
@@ -182,11 +180,11 @@ function castRay( orig, dir, scene, depth) {
 
         var reflectionDirection = reflect(dir.clone(), param.N.clone());
         let ttt = new Vector3().dotProduct(reflectionDirection, param.N)
-          // console.error(ttt);
+        // console.error(ttt);
         if (ttt < 0) {
           debugger
         }
-          // if()
+        // if()
         var reflectionRayOrig = ttt < 0 ? ret2 : ret1
         const aaa = castRay(reflectionRayOrig, reflectionDirection, scene, depth + 1)
         hitColor = aaa.multiplyScalar(kr)
@@ -198,7 +196,7 @@ function castRay( orig, dir, scene, depth) {
         var specularColor = new Vector3()
         var ret1 = hitPoint.clone().add(param.N.clone().multiplyScalar(scene.epsilon))
         var ret2 = hitPoint.clone().sub(param.N.clone().multiplyScalar(scene.epsilon))
-        var shadowPointOrig = (new Vector3().dotProduct(dir, param.N) < 0) ? ret1:ret2
+        var shadowPointOrig = (new Vector3().dotProduct(dir, param.N) < 0) ? ret1 : ret2
         var light = scene.get_lights()[0]
         if (light) {
           var lightDir = light.position.clone().sub(hitPoint)
@@ -211,7 +209,7 @@ function castRay( orig, dir, scene, depth) {
           var shadow_res = trace(shadowPointOrig, lightDir, scene.get_objects());
           var inShadow = false
           if (shadow_res && shadow_res.tNear * shadow_res.tNear < lightDistance2) {
-            inShadow = true
+            // inShadow = true
           }
           if (payload.hit_obj.name == "plane") {
             // debugger
@@ -219,7 +217,7 @@ function castRay( orig, dir, scene, depth) {
 
           let retTTT = light.intensity * LdotN;
 
-          lightAmt.addScalar(inShadow?0:retTTT)
+          lightAmt.addScalar(inShadow ? 0 : retTTT)
           var reflectionDirection = reflect(new Vector3().copy(lightDir).negate(), param.N.clone());
 
           const ttt = Math.max(0, -new Vector3().dotProduct(reflectionDirection, dir))
@@ -229,9 +227,9 @@ function castRay( orig, dir, scene, depth) {
 
         const obj = payload.hit_obj
         const objColor = obj.evalDiffuseColor()
-        let ret1Color = lightAmt.multiply(objColor)
+        let ret1Color = lightAmt.clone().multiply(objColor)
         let ret2Color = specularColor.multiplyScalar(obj.Ks)
-        hitColor =  ret2Color.add(ret1Color)
+        hitColor = ret2Color.add(ret1Color)
         break;
       }
     }
@@ -249,16 +247,8 @@ export class Renderer {
     const framebuffer = []
     var scale = Math.tan(deg2rad(scene.fov * 0.5));
     var imageAspectRatio = scene.width / scene.height;
-    var eye_pos = new Vector3(0, 0, 0)
-    let mat1 = new Matrix4()
-    let mat2 = new Matrix4()
-    mat1.makeTranslation(0,0,0)
-    eye_pos.applyMatrix4(mat1.clone())
+    var eye_pos = new Vector3(-1, 5, 10)
 
-    mat2.makeRotationX(0.5)
-    // eye_pos.applyMatrix4(mat2.clone())
-
-    const fov = 45
     var m = 0;
     for (var j = 0; j < scene.height; ++j) {
       for (var i = 0; i < scene.width; ++i) {
@@ -266,14 +256,10 @@ export class Renderer {
         var y;
         x = imageAspectRatio * (2 * (i + 0.5) / scene.width - 1);
         y = 1 - (2 * (j + 0.5) / scene.height);
-        x *= Math.tan(fov*Math.PI/180)
-        y *= Math.tan(fov*Math.PI/180)
         var dir = new Vector3(x, y, -1).normalize()
-        dir.applyMatrix4(mat1)
-        // dir.applyMatrix4(mat2)
-
         framebuffer[m++] = castRay(eye_pos, dir, scene, 0);
       }
+      // UpdateProgress(j / (var) scene.height);
     }
     return framebuffer
 

@@ -7,49 +7,14 @@ import CanvasTool from './CanvasTool.js'
 import Light from './Light.js'
 import MeshTriangle from './Triangle.js'
 import B from './Bounds3.js'
+import OBJLoader from './MyOBJLoader.js'
 
 export default class App {
   constructor() {
-    window.lm = this
-     const w = 512
-     const h = w
-    let scene = new Scene(w, h)
-    // let s1 = new Sphere(new Vector3(-1, 0, -12), 2)
-    // s1.name = "s1"
-    // s1.materialType = MaterialType.DIFFUSE_AND_GLOSSY
-    // s1.diffuseColor = new Vector3(0.6, 0.7, 0.8);
-    // scene.AddObj(s1)
+    this.buildScene(256)
+  }
 
-    // let s2 = new Sphere(new Vector3(0.5, -0.5, -8), 1.5)
-    // s2.name = "s2"
-    // s2.materialType = MaterialType.REFLECTION_AND_REFRACTION
-    // s2.diffuseColor = new Vector3(1, 0.7, 0.8);
-    // s2.ior = 1.5
-    // scene.AddObj(s2)
-
-    let l1 = new Light(new Vector3(20, 20, 20), 1)
-    scene.AddLight(l1)
-    this.light = l1
-
-    // var verts = [
-    //   -5, -3, -6,  //[0]
-    //   5, -3, -6,   //[1]
-    //   5, -3, -16,  //[2]
-    //   -5, -3, -16];//[3]
-    // var vertIndex = [
-    //   0, 1, 3,
-    //   1,2, 3
-    // ]
-    // var st =  [  0, 0 ,  1, 0 ,  1, 1 ,  0, 1 ];
-
-    // let t = new Triangle(verts, vertIndex, 2, st)
-    // t.diffuseColor = new Vector3(0.5, 0.8, 0.5);
-    // scene.AddObj(t)
-
-    let renderer = new Renderer()
-    this.scene = scene
-
-    // show by canvas
+  initCanvas(w,h) {
     let canvas = document.querySelector("#canvas")
     canvas.width = w
     canvas.height = h
@@ -59,26 +24,62 @@ export default class App {
 
     ctx.strokeStyle = "#0000ff";
     ctx.strokeRect(0, 0, w, h);
-
     this.ctx = ctx
-    this.renderer = renderer
+  }
+
+  getTrangeMesh() {
+    return new Promise((resolve, rejuect) => {
+      new OBJLoader().load("../models/bunny/bunny.obj", (ret) => {
+        const count = ret.faces.length
+        const indexes = []
+        ret.faces.forEach(item => {
+          indexes.push(...item)
+        });
+        const verts = []
+        ret.verts.forEach(item => {
+          verts.push(item.x*50)
+          verts.push(item.y * 50)
+          verts.push(item.z * 50)
+        });
+        resolve({
+          indexes,
+          count,
+          verts,
+          st: []
+        })
+      })
+    })
+  }
+
+  async buildScene(_w) {
+    const objInfo = await this.getTrangeMesh()
+    console.error(objInfo);
+
+    const w = _w
+    const h = w
     this.w = w
     this.h = h
-    this.update()
-  }
+    this.scene = new Scene(w, h)
+    this.initCanvas(w, h)
 
-  get lightPos() {
-    return this.light.position
-  }
-  set lightPos(pos) {
-    this.light.position.set(pos.x, pos.y, pos.z)
+    this.renderer = new Renderer()
+
+    const mesh = new MeshTriangle(objInfo.verts, objInfo.indexes, objInfo.count, objInfo.st)
+    mesh.diffuseColor = new Vector3(0.5, 0.5, 0.5);
+    mesh.materialType = MaterialType.DIFFUSE_AND_GLOSSY
+    mesh.Ks = 1
+    this.scene.AddObj(mesh)
+
+    const light = new Light(new Vector3(20, 20, -10), 1)
+    this.scene.AddLight(light)
     this.update()
   }
 
   update() {
+    console.time("render")
     const { w,h} = this
-    let data = this.renderer.Render(this.scene)
-    let imageData = this.ctx.getImageData(0, 0, w, h)
+    const data = this.renderer.Render(this.scene)
+    const imageData = this.ctx.getImageData(0, 0, w, h)
     for (let i = 0; i < data.length; i++) {
       const pixel = data[i]
       const color = [pixel.x * 255, pixel.y * 255, pixel.z * 255, 255]
@@ -91,6 +92,7 @@ export default class App {
       })
     }
     this.ctx.putImageData(imageData, 0, 0);
+    console.timeEnd("render")
   }
 }
 

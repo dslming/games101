@@ -82,10 +82,19 @@ public:
 
         assert(loader.LoadedMeshes.size() == 1);
         auto mesh = loader.LoadedMeshes[0];
-
-        Vector3f min_vert = Vector3f{std::numeric_limits<float>::infinity(),
-                                     std::numeric_limits<float>::infinity(),
-                                     std::numeric_limits<float>::infinity()};
+        for (int i = 0; i < mesh.Vertices.size();i++)
+        {
+            if(i>10){
+                break;
+            }
+            auto item = mesh.Vertices[i].Position;
+            std::cout << item.X << std::endl;
+            std::cout << item.Y << std::endl;
+            std::cout << item.Z << std::endl;
+        }
+            Vector3f min_vert = Vector3f{std::numeric_limits<float>::infinity(),
+                                         std::numeric_limits<float>::infinity(),
+                                         std::numeric_limits<float>::infinity()};
         Vector3f max_vert = Vector3f{-std::numeric_limits<float>::infinity(),
                                      -std::numeric_limits<float>::infinity(),
                                      -std::numeric_limits<float>::infinity()};

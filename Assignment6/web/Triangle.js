@@ -1,5 +1,5 @@
 import Object from './Object.js'
-import {Vector3} from './Vector3.js'
+import { Vector3 } from './Vector3.js'
 import { Vector2 } from './Vector2.js'
 
 // Moller-Trumbore
@@ -27,18 +27,18 @@ function rayTriangleIntersect(v0, v1, v2, orig, dir, param) {
   return false;
 }
 
-export default class MeshTriangle extends Object {
-  constructor(verts, vertsIndex, numTris,st) {
+export default class Triangle extends Object {
+  constructor(verts, vertsIndex, numTris, st) {
     super()
     this.name = "plane"
     this.numTriangles
     this.vertices = []
     this.vertexIndex = []
     this.stCoordinates = []
-    this.getMeshTriangle(verts, vertsIndex, numTris,st)
+    this.getMeshTriangle(verts, vertsIndex, numTris, st)
   }
 
-  getMeshTriangle( verts, vertsIndex,numTris,st) {
+  getMeshTriangle(verts, vertsIndex, numTris, st) {
     var maxIndex = 0;
     for (var i = 0; i < numTris * 3; ++i)
       if (vertsIndex[i] > maxIndex)
@@ -50,20 +50,20 @@ export default class MeshTriangle extends Object {
     this.stCoordinates = st
   }
   getVertsByIndex(index) {
-    let x = this.vertices[index*3]
-    let y = this.vertices[index*3+1]
-    let z = this.vertices[index*3 + 2]
-    return new Vector3(x,y,z)
+    let x = this.vertices[index * 3]
+    let y = this.vertices[index * 3 + 1]
+    let z = this.vertices[index * 3 + 2]
+    return new Vector3(x, y, z)
   }
 
-   getStCoordByIndex(index) {
-     let x = this.stCoordinates[index]
-     let y = this.stCoordinates[index + 1]
-     return new Vector2(x, y)
-   }
+  getStCoordByIndex(index) {
+    let x = this.stCoordinates[index]
+    let y = this.stCoordinates[index + 1]
+    return new Vector2(x, y)
+  }
 
   intersect(orig, dir, param) {
-    const { tNearK:tnear } = param
+    const { tNearK: tnear } = param
     var intersect = false;
     for (var k = 0; k < this.numTriangles; ++k) {
       const v0 = this.getVertsByIndex(this.vertexIndex[k * 3]);
@@ -87,7 +87,7 @@ export default class MeshTriangle extends Object {
   }
 
   getSurfaceProperties(param) {
-    const { index,uv } = param
+    const { index, uv } = param
     const { vertexIndex } = this
     const v0 = this.getVertsByIndex(vertexIndex[index * 3])
     const v1 = this.getVertsByIndex(vertexIndex[index * 3 + 1])
@@ -95,13 +95,13 @@ export default class MeshTriangle extends Object {
     var e0 = v1.clone().sub(v0).normalize();
     var e1 = v2.clone().sub(v1).normalize();
     param.N = new Vector3().crossProduct(e0, e1).normalize()
-    const st0 = this.getStCoordByIndex(vertexIndex[index * 3])
-    const st1 = this.getStCoordByIndex(vertexIndex[index * 3 + 1])
-    const st2 = this.getStCoordByIndex(vertexIndex[index * 3 + 2])
-    const ret1 = st0.multiplyScalar((1 - uv.x - uv.y))
-    const ret2 = st1.multiplyScalar(uv.x)
-    const ret3 = st2.multiplyScalar(uv.y)
-    param.st = ret1.add(ret2).add(ret3)
+    // const st0 = this.getStCoordByIndex(vertexIndex[index * 3])
+    // const st1 = this.getStCoordByIndex(vertexIndex[index * 3 + 1])
+    // const st2 = this.getStCoordByIndex(vertexIndex[index * 3 + 2])
+    // const ret1 = st0.multiplyScalar((1 - uv.x - uv.y))
+    // const ret2 = st1.multiplyScalar(uv.x)
+    // const ret3 = st2.multiplyScalar(uv.y)
+    // param.st = ret1.add(ret2).add(ret3)
   }
 
   // evalDiffuseColor( st) {
