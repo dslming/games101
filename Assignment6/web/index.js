@@ -1,12 +1,11 @@
 import Scene from './Scene.js'
-import Sphere from './Sphere.js'
 import { Vector3 } from './Vector3.js'
-import { MaterialType } from './global.js'
+
 import { Renderer, reflect } from './Renderer.js'
 import CanvasTool from './CanvasTool.js'
 import Light from './Light.js'
-import MeshTriangle from './Triangle.js'
-import Bounds3 from './Bounds3.js'
+import TrialgleMesh from './TrialgleMesh.js'
+
 import OBJLoader from './MyOBJLoader.js'
 
 export default class App {
@@ -30,29 +29,16 @@ export default class App {
   getTrangeMesh() {
     return new Promise((resolve, rejuect) => {
       new OBJLoader().load("../models/bunny/bunny.obj", (ret) => {
-        const count = ret.faces.length
-        const indexes = []
-        ret.faces.forEach(item => {
-          indexes.push(...item)
-        });
-        const verts = []
-        const bounds3 = new Bounds3()
         ret.verts.forEach(item => {
-          const x = item.x * 50
-          const y = item.y * 50
-          const z = item.z * 50
-          verts.push(x,y,z)
-          bounds3.pMin.min({ x, y, z })
-          bounds3.pMax.max({ x, y, z })
+          item.x = item.x * 50
+          item.y = item.y * 50
+          item.z = item.z * 50
         });
-        console.error(bounds3);
+        console.error(ret);
 
         resolve({
-          indexes,
-          count,
-          verts,
-          st: [],
-          bounds3
+          verts: ret.verts,
+          faces: ret.faces
         })
       })
     })
@@ -60,7 +46,6 @@ export default class App {
 
   async buildScene(_w) {
     const objInfo = await this.getTrangeMesh()
-    console.error(objInfo);
 
     const w = _w
     const h = w
@@ -71,17 +56,10 @@ export default class App {
 
     this.renderer = new Renderer()
 
-    const mesh = new MeshTriangle(
-      objInfo.verts,
-      objInfo.indexes,
-      objInfo.count,
-      objInfo.st,
-      objInfo.bounds3
-    )
-    mesh.diffuseColor = new Vector3(0.5, 0.5, 0.5);
-    mesh.materialType = MaterialType.DIFFUSE_AND_GLOSSY
-    mesh.Ks = 1
-    this.scene.AddObj(mesh)
+    const mesh = new TrialgleMesh(objInfo.verts, objInfo.faces)
+    mesh.triangles.forEach(obj => {
+      this.scene.AddObj(obj)
+    })
 
     const light = new Light(new Vector3(20, 20, -10), 1)
     this.scene.AddLight(light)

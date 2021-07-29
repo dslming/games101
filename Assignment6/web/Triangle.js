@@ -1,3 +1,5 @@
+// 一个三角形网格
+
 import Object from './Object.js'
 import { Vector3 } from './Vector3.js'
 import { Vector2 } from './Vector2.js'
@@ -27,15 +29,14 @@ function rayTriangleIntersect(v0, v1, v2, orig, dir, param) {
   return false;
 }
 
-export default class TriangleMesh extends Object {
-  constructor(verts, vertsIndex, numTris, st, bounds3) {
+export default class Triangle extends Object {
+  constructor(verts, vertsIndex, numTris, st) {
     super()
-    this.name = "plane"
+    this.name = "triangle"
     this.numTriangles
     this.vertices = []
     this.vertexIndex = []
     this.stCoordinates = []
-    this.bounds3 = bounds3
     this.getMeshTriangle(verts, vertsIndex, numTris, st)
   }
 
@@ -70,7 +71,6 @@ export default class TriangleMesh extends Object {
       const v0 = this.getVertsByIndex(this.vertexIndex[k * 3]);
       const v1 = this.getVertsByIndex(this.vertexIndex[k * 3 + 1]);
       const v2 = this.getVertsByIndex(this.vertexIndex[k * 3 + 2]);
-      // var t, u, v;
       const obj = {
         tNear: 0,
         uv: {},
