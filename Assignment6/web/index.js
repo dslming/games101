@@ -6,12 +6,12 @@ import { Renderer, reflect } from './Renderer.js'
 import CanvasTool from './CanvasTool.js'
 import Light from './Light.js'
 import MeshTriangle from './Triangle.js'
-import B from './Bounds3.js'
+import Bounds3 from './Bounds3.js'
 import OBJLoader from './MyOBJLoader.js'
 
 export default class App {
   constructor() {
-    this.buildScene(256)
+    this.buildScene(64)
   }
 
   initCanvas(w,h) {
@@ -36,16 +36,23 @@ export default class App {
           indexes.push(...item)
         });
         const verts = []
+        const bounds3 = new Bounds3()
         ret.verts.forEach(item => {
-          verts.push(item.x*50)
-          verts.push(item.y * 50)
-          verts.push(item.z * 50)
+          const x = item.x * 50
+          const y = item.y * 50
+          const z = item.z * 50
+          verts.push(x,y,z)
+          bounds3.pMin.min({ x, y, z })
+          bounds3.pMax.max({ x, y, z })
         });
+        console.error(bounds3);
+
         resolve({
           indexes,
           count,
           verts,
-          st: []
+          st: [],
+          bounds3
         })
       })
     })
@@ -64,7 +71,13 @@ export default class App {
 
     this.renderer = new Renderer()
 
-    const mesh = new MeshTriangle(objInfo.verts, objInfo.indexes, objInfo.count, objInfo.st)
+    const mesh = new MeshTriangle(
+      objInfo.verts,
+      objInfo.indexes,
+      objInfo.count,
+      objInfo.st,
+      objInfo.bounds3
+    )
     mesh.diffuseColor = new Vector3(0.5, 0.5, 0.5);
     mesh.materialType = MaterialType.DIFFUSE_AND_GLOSSY
     mesh.Ks = 1

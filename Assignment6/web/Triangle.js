@@ -27,14 +27,15 @@ function rayTriangleIntersect(v0, v1, v2, orig, dir, param) {
   return false;
 }
 
-export default class Triangle extends Object {
-  constructor(verts, vertsIndex, numTris, st) {
+export default class TriangleMesh extends Object {
+  constructor(verts, vertsIndex, numTris, st, bounds3) {
     super()
     this.name = "plane"
     this.numTriangles
     this.vertices = []
     this.vertexIndex = []
     this.stCoordinates = []
+    this.bounds3 = bounds3
     this.getMeshTriangle(verts, vertsIndex, numTris, st)
   }
 
