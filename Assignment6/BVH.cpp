@@ -9,6 +9,9 @@ BVHAccel::BVHAccel(std::vector<Object*> p, int maxPrimsInNode,
 {
     time_t start, stop;
     time(&start);
+    std::cout << 123 << std::endl;
+    std::cout << primitives.size() << std::endl;
+    std::cout << p.size() << std::endl;
     if (primitives.empty())
         return;
     //BVH
@@ -32,7 +35,8 @@ BVHAccel::BVHAccel(std::vector<Object*> p, int maxPrimsInNode,
 BVHBuildNode* BVHAccel::recursiveBuild(std::vector<Object*> objects)
 {
     BVHBuildNode* node = new BVHBuildNode();
-
+    std::cout << objects.size() << std::endl;
+    std::cout << objects[0]->getBounds().pMax << std::endl;
     // Compute bounds of all primitives in BVH node
     Bounds3 bounds;
     for (int i = 0; i < objects.size(); ++i)
@@ -121,7 +125,7 @@ BVHBuildNode* BVHAccel::SAH_recursiveBuild(std::vector<Object*>objects)
         return node;
     }
     else {
-        
+
         Bounds3 centroidBounds;
         for (int i = 0; i < objects.size(); ++i)
             centroidBounds =
@@ -147,7 +151,7 @@ BVHBuildNode* BVHAccel::SAH_recursiveBuild(std::vector<Object*>objects)
             });
             break;
         }
-        
+
 
         auto beginning = objects.begin();
         auto middling = objects.begin();
@@ -202,7 +206,7 @@ Intersection BVHAccel::getIntersection(BVHBuildNode* node, const Ray& ray) const
     // TODO Traverse the BVH to find intersection
     std::array<int, 3> dirisNeg = {int(ray.direction.x >0),int(ray.direction.y>0),int(ray.direction.z>0)};
     Intersection inter;
-    if(node->bounds.IntersectP(ray,Vector3f(1.0f/ray.direction.x,1.0f/ray.direction.y,1.0f/ray.direction.z),dirisNeg) == false) 
+    if(node->bounds.IntersectP(ray,Vector3f(1.0f/ray.direction.x,1.0f/ray.direction.y,1.0f/ray.direction.z),dirisNeg) == false)
     return Intersection();
     if(node->left == nullptr && node->right == nullptr)
         return node->object->getIntersection(ray);

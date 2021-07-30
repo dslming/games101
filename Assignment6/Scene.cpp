@@ -7,6 +7,7 @@
 
 void Scene::buildBVH() {
     printf(" - Generating BVH...\n\n");
+    std::cout << objects.size() << std::endl;
     this->bvh = new BVHAccel(objects, 1, BVHAccel::SplitMethod::NAIVE);
 }
 

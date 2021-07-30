@@ -27,66 +27,82 @@ export default class BVHAccel {
     if (primitives.length == 0) {
       return
     }
-
+    console.time("bvh build")
     this.root = this.recursiveBuild(primitives)
+    console.error(this.root);
+
+    console.timeEnd("bvh build")
   }
 
-  WorldBound() { }
 
   Intersect() { }
 
-  getIntersection() { }
+  getIntersection(node, ray) {
 
-  IntersectP() { }
+  }
+
 
   recursiveBuild(objects) {
     if (!Array.isArray(objects)) return
     const node = new BVHBuildNode()
-
-    // let bounds = new Bounds3()
+    const size = objects.length
+    let bounds = new Bounds3()
     for (let i = 0; i < objects.length; ++i) {
-      // bounds = Bounds3.Union(bounds, objects[i].getBounds());
-      if (objects.length == 1) {
-        node.bounds = objects[0].getBounds();
-        node.object = objects[0];
-        node.left = null;
-        node.right = null;
-        return node;
-      } else if (objects.length == 2) {
-        node.left = recursiveBuild([objects[0]]);
-        node.right = recursiveBuild([objects[1]]);
-        node.bounds = Bounds3.Union(node.left.bounds, node.right.bounds);
-        return node;
-      } else {
-        let centroidBounds = new Bounds3()
-        for (let i = 0; i < objects.length; ++i)
-          centroidBounds = Bounds3.UnionVector3(centroidBounds, objects[i].getBounds().Centroid());
-        let dim = centroidBounds.maxExtent();
-        switch (dim) {
-          case 0:
-            objects.sort((a, b) => {
-              return a.getBounds().x < b.getBounds().x
-            })
-            // std::sort(objects.begin(), objects.end(), [](auto f1, auto f2) {
-            //   return f1 - > getBounds().Centroid().x <
-            //     f2 - > getBounds().Centroid().x;
-            // });
-            break;
-          case 1:
-            // std::sort(objects.begin(), objects.end(), [](auto f1, auto f2) {
-            //   return f1 - > getBounds().Centroid().y <
-            //     f2 - > getBounds().Centroid().y;
-            // });
-            break;
-          case 2:
-            // std::sort(objects.begin(), objects.end(), [](auto f1, auto f2) {
-            //   return f1 - > getBounds().Centroid().z <
-            //     f2 - > getBounds().Centroid().z;
-            // });
-            break;
+      bounds = Bounds3.Union(bounds, objects[i].getBounds());
+    }
+
+    if (objects.length == 1) {
+      node.bounds = objects[0].getBounds();
+      node.object = objects[0];
+      node.left = null;
+      node.right = null;
+      return node;
+    } else if (objects.length == 2) {
+      node.left = this.recursiveBuild([objects[0]]);
+      node.right = this.recursiveBuild([objects[1]]);
+      node.bounds = Bounds3.Union(node.left.bounds, node.right.bounds);
+      return node;
+    } else {
+      let centroidBounds = new Bounds3()
+      for (let i = 0; i < objects.length; ++i) {
+        centroidBounds = Bounds3.UnionVector3(centroidBounds, objects[i].getBounds().Centroid());
+      }
+
+      let dim = centroidBounds.maxExtent();
+      switch (dim) {
+        case 0:
+          objects.sort((a, b) => {
+            return a.getBounds().x - b.getBounds().x
+          })
+          break;
+        case 1:
+          objects.sort((a, b) => {
+            return a.getBounds().y - b.getBounds().y
+          })
+          break;
+        case 2:
+          objects.sort((a, b) => {
+            return a.getBounds().z - b.getBounds().z
+          })
+          break;
+      }
+
+      const leftshapes = []
+      const rightshapes = []
+      for (let j = 0; j < size; j++) {
+        const obj = objects[j]
+        if (j < size / 2) {
+          leftshapes.push(obj)
+        } else {
+          rightshapes.push(obj)
         }
       }
+
+      node.left = this.recursiveBuild(leftshapes);
+      node.right = this.recursiveBuild(rightshapes);
+      node.bounds = Bounds3.Union(node.left.bounds, node.right.bounds)
     }
+    return node
   }
 
 }

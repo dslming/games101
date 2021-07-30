@@ -1,5 +1,5 @@
 import { Vector3 } from './Vector3.js'
-
+import BVHAccel from './BVH.js'
 export default class Scene {
   constructor(w, h) {
     this.objects = []
@@ -11,6 +11,10 @@ export default class Scene {
     // this.backgroundColor = new Vector3(1, 1, 1);
     this.maxDepth = 5;
     this.epsilon = 0.00001;
+  }
+
+  buildBVH() {
+    this.bvh = new BVHAccel(this.objects)
   }
 
   AddObj(object) {

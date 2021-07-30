@@ -240,7 +240,6 @@ function castRay(orig, dir, scene, depth) {
 
 export class Renderer {
   constructor() {
-
   }
 
   Render(scene) {

@@ -57,9 +57,9 @@ export default class App {
     this.renderer = new Renderer()
 
     const mesh = new TrialgleMesh(objInfo.verts, objInfo.faces)
-    mesh.triangles.forEach(obj => {
-      this.scene.AddObj(obj)
-    })
+    // mesh.triangles.forEach(obj => {
+    //   this.scene.AddObj(obj)
+    // })
 
     const light = new Light(new Vector3(20, 20, -10), 1)
     this.scene.AddLight(light)
