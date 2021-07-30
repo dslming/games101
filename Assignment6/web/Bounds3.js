@@ -99,10 +99,15 @@ export default class Bounds3 {
   }
 
   // 合并
-  Union(b1,b2) {
-    var ret;
-    ret.min = b1.pMin.min(b2.pMin);
-    ret.max = b1.pMax.min(b2.pMax);
-    return ret;
+  static Union(b1, b2) {
+    const pMin = b1.pMin.clone().min(b2.pMin);
+    const pMax = b1.pMax.clone().max(b2.pMax);
+    return new Bounds3(pMin, pMax)
+  }
+
+  static UnionVector3(b, v) {
+    const pMin = b.pMin.clone().min(v);
+    const pMax = b.pMax.clone().max(v);
+    return new Bounds3(pMin, pMax)
   }
 }

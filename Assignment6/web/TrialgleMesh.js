@@ -19,10 +19,19 @@ export default class TrialgleMesh {
     });
 
     for (let i = 0; i < faces.length; i++) {
+      const bounds3 = new Bounds3()
       const indexes = faces[i]
       const v0 = verts[indexes[0]]
       const v1 = verts[indexes[1]]
       const v2 = verts[indexes[2]]
+      bounds3.pMin.min(v0)
+      bounds3.pMin.min(v1)
+      bounds3.pMin.min(v2)
+
+      bounds3.pMax.max(v0)
+      bounds3.pMax.max(v1)
+      bounds3.pMax.max(v2)
+
       const triangleVerts = [
         v0.x,
         v0.y,
@@ -34,13 +43,13 @@ export default class TrialgleMesh {
         v2.y,
         v2.z,
       ]
-      const t = new Triangle(triangleVerts, [0, 1, 2], 1, [])
+      const t = new Triangle(triangleVerts, [0, 1, 2], 1, [], bounds3)
       t.diffuseColor = new Vector3(0.5, 0.5, 0.5);
       t.materialType = MaterialType.DIFFUSE_AND_GLOSSY
       t.Ks = 1
       this.triangles.push(t)
     }
 
-
+    new BVHAccel(this.triangles)
   }
 }

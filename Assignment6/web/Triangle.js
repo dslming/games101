@@ -3,6 +3,7 @@
 import Object from './Object.js'
 import { Vector3 } from './Vector3.js'
 import { Vector2 } from './Vector2.js'
+import Bounds3 from './Bounds3.js'
 
 // Moller-Trumbore
 function rayTriangleIntersect(v0, v1, v2, orig, dir, param) {
@@ -30,8 +31,9 @@ function rayTriangleIntersect(v0, v1, v2, orig, dir, param) {
 }
 
 export default class Triangle extends Object {
-  constructor(verts, vertsIndex, numTris, st) {
+  constructor(verts, vertsIndex, numTris, st, bounds3) {
     super()
+    this.bounds3 = bounds3
     this.name = "triangle"
     this.numTriangles
     this.vertices = []
@@ -41,11 +43,13 @@ export default class Triangle extends Object {
   }
 
   getMeshTriangle(verts, vertsIndex, numTris, st) {
-    var maxIndex = 0;
-    for (var i = 0; i < numTris * 3; ++i)
-      if (vertsIndex[i] > maxIndex)
-        maxIndex = vertsIndex[i];
-    maxIndex += 1;
+    // var maxIndex = 0;
+    // for (var i = 0; i < numTris * 3; ++i) {
+
+    // }
+      // if (vertsIndex[i] > maxIndex)
+        // maxIndex = vertsIndex[i];
+    // maxIndex += 1;
     this.vertices = verts
     this.vertexIndex = vertsIndex //std::unique_ptr < var[] > (new var[numTris * 3]);
     this.numTriangles = numTris;
@@ -105,6 +109,9 @@ export default class Triangle extends Object {
     // param.st = ret1.add(ret2).add(ret3)
   }
 
+  getBounds() {
+    return this.bounds3
+  }
   // evalDiffuseColor( st) {
   //   // var scale = 5;
   //   // var pattern = (fmodf(st.x * scale, 1) > 0.5) ^ (fmodf(st.y * scale, 1) > 0.5);
