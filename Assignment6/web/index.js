@@ -10,7 +10,7 @@ import OBJLoader from './MyOBJLoader.js'
 
 export default class App {
   constructor() {
-    this.buildScene(32)
+    this.buildScene(256)
   }
 
   initCanvas(w,h) {
@@ -27,9 +27,9 @@ export default class App {
   }
 
   getTrangeMesh() {
-    const scale = 1
+    const scale = 20
     return new Promise((resolve, rejuect) => {
-      new OBJLoader().load("../models/bunny/cube.obj", (ret) => {
+      new OBJLoader().load("../models/bunny/bunny.obj", (ret) => {
         ret.verts.forEach(item => {
           item.x = item.x * scale
           item.y = item.y * scale
@@ -63,7 +63,7 @@ export default class App {
     //   this.scene.AddObj(obj)
     // })
 
-    const light = new Light(new Vector3(20, 20, -10), 1)
+    const light = new Light(new Vector3(20, 20, 10), 1)
     this.scene.AddLight(light)
     this.scene.buildBVH()
 

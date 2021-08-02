@@ -73,31 +73,78 @@ export default class Bounds3 {
    * @param invDir = (1.0 / x, 1.0 / y, 1.0 / z)
    * @param dirIsNeg: ray direction(x, y, z)
    */
-  IntersectP(ray,invDir,dirIsNeg) {
-    var t1 = 0;
-    var t2 = 0;
-    t1 = (this.pMin.x - ray.origin.x) * invDir.x;
-    t2 = (this.pMax.x - ray.origin.x) * invDir.x;
-    var txmin = (dirIsNeg[0] > 0) ? t1 : t2;
-    var txmax = (dirIsNeg[0] > 0) ? t2 : t1;
+  // IntersectP(ray,invDir,dirIsNeg) {
+  //   var t1 = 0;
+  //   var t2 = 0;
+  //   t1 = (this.pMin.x - ray.origin.x) * invDir.x;
+  //   t2 = (this.pMax.x - ray.origin.x) * invDir.x;
+  //   var txmin = (dirIsNeg[0] > 0) ? t1 : t2;
+  //   var txmax = (dirIsNeg[0] > 0) ? t2 : t1;
 
-    t1 = (this.pMin.y - ray.origin.y) * invDir.y;
-    t2 = (this.pMax.y - ray.origin.y) * invDir.y;
-    var tymin = (dirIsNeg[1] > 0) ? t1 : t2;
-    var tymax = (dirIsNeg[1] > 0) ? t2 : t1;
+  //   t1 = (this.pMin.y - ray.origin.y) * invDir.y;
+  //   t2 = (this.pMax.y - ray.origin.y) * invDir.y;
+  //   var tymin = (dirIsNeg[1] > 0) ? t1 : t2;
+  //   var tymax = (dirIsNeg[1] > 0) ? t2 : t1;
 
-    t1 = (this.pMin.z - ray.origin.z) * invDir.z;
-    t2 = (this.pMax.z - ray.origin.z) * invDir.z;
-    var tzmin = (dirIsNeg[2] > 0) ? t1 : t2;
-    var tzmax = (dirIsNeg[2] > 0) ? t2 : t1;
+  //   t1 = (this.pMin.z - ray.origin.z) * invDir.z;
+  //   t2 = (this.pMax.z - ray.origin.z) * invDir.z;
+  //   var tzmin = (dirIsNeg[2] > 0) ? t1 : t2;
+  //   var tzmax = (dirIsNeg[2] > 0) ? t2 : t1;
 
-    if (
-      Math.max(Math.max(txmin, tymin), tzmin) <
-      Math.min(Math.min(txmax, tymax), tzmax) &&
-      Math.min(Math.min(txmax, tymax), tzmax))
+  //   if (
+  //     Math.max(Math.max(txmin, tymin), tzmin) <
+  //     Math.min(Math.min(txmax, tymax), tzmax) &&
+  //     Math.min(Math.min(txmax, tymax), tzmax))
+  //     return true;
+  //   else
+  //     return false;
+  // }
+  IntersectP(ray, invDir, dirIsNeg) {
+    if (Math.abs(invDir.x) == Infinity) {
+      invDir.x = 999999
+    }
+     if (Math.abs(invDir.y) == Infinity) {
+       invDir.y = 999999
+    }
+     if (Math.abs(invDir.z) == Infinity) {
+       invDir.z = 999999
+    }
+
+    var tx_min = (this.pMin.x - ray.origin.x) * invDir.x;
+    var tx_max = (this.pMax.x - ray.origin.x) * invDir.x;
+
+    var ty_min = (this.pMin.y - ray.origin.y) * invDir.y;
+    var ty_max = (this.pMax.y - ray.origin.y) * invDir.y;
+
+    var tz_min = (this.pMin.z - ray.origin.z) * invDir.z;
+    var tz_max = (this.pMax.z - ray.origin.z) * invDir.z;
+
+    if (tx_min > tx_max) {
+      var t = tx_min;
+      tx_min = tx_max;
+      tx_max = t;
+    }
+
+    if (ty_min > ty_max) {
+      var t = ty_min;
+      ty_min = ty_max;
+      ty_max = t;
+    }
+
+    if (tz_min > tz_max) {
+      var t = tz_min;
+      tz_min = tz_max;
+      tz_max = t;
+    }
+
+    var t_enter = Math.max(tx_min, Math.max(ty_min, tz_min));
+    var t_exit = Math.min(tx_max, Math.min(ty_max, tz_max));
+
+    if (t_enter <= t_exit && t_exit >= 0) {
       return true;
-    else
-      return false;
+    }
+
+    return false;
   }
   // IntersectP(r) {
   //   var tmin, tmax, tymin, tymax, tzmin, tzmax;

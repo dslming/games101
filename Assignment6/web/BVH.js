@@ -12,6 +12,7 @@ class BVHBuildNode {
     this.left = null
     this.right = null
     this.object = {}
+    this.level = 0
   }
 };
 
@@ -29,7 +30,7 @@ export default class BVHAccel {
       return
     }
     console.time("bvh build")
-    this.root = this.recursiveBuild(primitives)
+    this.root = this.recursiveBuild(primitives, 0)
     console.error(this.root);
 
     console.timeEnd("bvh build")
@@ -64,15 +65,21 @@ export default class BVHAccel {
     if (hit1 && hit2) {
       return (hit1.distance < hit2.distance) ? hit1 : hit2;
     }
-    if (hit2 || hit1) {
-      debugger
+    if (hit1 && !hit2) {
+      return hit1
+    }
+
+    if (hit2 && !hit1) {
+      return hit2
     }
   }
 
 
-  recursiveBuild(objects) {
+  recursiveBuild(objects,level) {
     if (!Array.isArray(objects)) return
     const node = new BVHBuildNode()
+    node.level = level
+    level+=1
     const size = objects.length
     let bounds = new Bounds3()
     for (let i = 0; i < objects.length; ++i) {
@@ -86,8 +93,8 @@ export default class BVHAccel {
       node.right = null;
       return node;
     } else if (objects.length == 2) {
-      node.left = this.recursiveBuild([objects[0]]);
-      node.right = this.recursiveBuild([objects[1]]);
+      node.left = this.recursiveBuild([objects[0]], level);
+      node.right = this.recursiveBuild([objects[1]], level);
       node.bounds = Bounds3.Union(node.left.bounds, node.right.bounds);
       return node;
     } else {
@@ -126,8 +133,8 @@ export default class BVHAccel {
         }
       }
 
-      node.left = this.recursiveBuild(leftshapes);
-      node.right = this.recursiveBuild(rightshapes);
+      node.left = this.recursiveBuild(leftshapes, level);
+      node.right = this.recursiveBuild(rightshapes, level);
       node.bounds = Bounds3.Union(node.left.bounds, node.right.bounds)
     }
     return node

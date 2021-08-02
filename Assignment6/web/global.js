@@ -27,8 +27,10 @@ function solveQuadratic(a, b, c, options) {
   return true;
 }
 
+const E = 0.0000000001;
 export {
   M_PI,
   solveQuadratic,
   MaterialType,
+  E
 }

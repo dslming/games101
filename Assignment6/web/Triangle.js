@@ -31,10 +31,10 @@ function rayTriangleIntersect(v0, v1, v2, orig, dir, param) {
 }
 
 export default class Triangle extends Object {
-  constructor(verts, vertsIndex, numTris, st, bounds3) {
+  constructor(verts, vertsIndex, numTris, st, bounds3,i) {
     super()
     this.bounds3 = bounds3
-    this.name = "triangle"
+    this.name = "triangle_"+i
     this.numTriangles
     this.vertices = []
     this.vertexIndex = []
@@ -43,13 +43,6 @@ export default class Triangle extends Object {
   }
 
   getMeshTriangle(verts, vertsIndex, numTris, st) {
-    // var maxIndex = 0;
-    // for (var i = 0; i < numTris * 3; ++i) {
-
-    // }
-      // if (vertsIndex[i] > maxIndex)
-        // maxIndex = vertsIndex[i];
-    // maxIndex += 1;
     this.vertices = verts
     this.vertexIndex = vertsIndex //std::unique_ptr < var[] > (new var[numTris * 3]);
     this.numTriangles = numTris;
@@ -68,57 +61,20 @@ export default class Triangle extends Object {
     return new Vector2(x, y)
   }
 
-  intersect(orig, dir, param) {
-    const { tNearK: tnear } = param
-    var intersect = false;
-    for (var k = 0; k < this.numTriangles; ++k) {
-      const v0 = this.getVertsByIndex(this.vertexIndex[k * 3]);
-      const v1 = this.getVertsByIndex(this.vertexIndex[k * 3 + 1]);
-      const v2 = this.getVertsByIndex(this.vertexIndex[k * 3 + 2]);
-      const obj = {
-        tNear: 0,
-        uv: {},
-      }
-      let ret = rayTriangleIntersect(v0, v1, v2, orig, dir, obj)
-      if (ret && obj.tNear < tnear) {
-        param.tNearK = obj.tNear;
-        param.uvK = obj.uv
-        param.indexK = k;
-        intersect |= true;
-      }
-    }
-
-    return intersect;
-  }
-
   getSurfaceProperties(param) {
-    const { index, uv } = param
     const { vertexIndex } = this
-    const v0 = this.getVertsByIndex(vertexIndex[index * 3])
-    const v1 = this.getVertsByIndex(vertexIndex[index * 3 + 1])
-    const v2 = this.getVertsByIndex(vertexIndex[index * 3 + 2])
+    const v0 = this.getVertsByIndex(vertexIndex[0])
+    const v1 = this.getVertsByIndex(vertexIndex[1])
+    const v2 = this.getVertsByIndex(vertexIndex[2])
     var e0 = v1.clone().sub(v0).normalize();
     var e1 = v2.clone().sub(v1).normalize();
     param.N = new Vector3().crossProduct(e0, e1).normalize()
-    // const st0 = this.getStCoordByIndex(vertexIndex[index * 3])
-    // const st1 = this.getStCoordByIndex(vertexIndex[index * 3 + 1])
-    // const st2 = this.getStCoordByIndex(vertexIndex[index * 3 + 2])
-    // const ret1 = st0.multiplyScalar((1 - uv.x - uv.y))
-    // const ret2 = st1.multiplyScalar(uv.x)
-    // const ret3 = st2.multiplyScalar(uv.y)
-    // param.st = ret1.add(ret2).add(ret3)
   }
 
   getBounds() {
     return this.bounds3
   }
-  // evalDiffuseColor( st) {
-  //   // var scale = 5;
-  //   // var pattern = (fmodf(st.x * scale, 1) > 0.5) ^ (fmodf(st.y * scale, 1) > 0.5);
 
-  //   // return lerp(Vector3f(0.815, 0.235, 0.031), Vector3f(0.937, 0.937, 0.231), pattern);
-  //   return new Vector3(0,1,0)
-  // }
   getIntersection(orig, dir) {
     // const { tNearK: tnear } = param
     const param = {}
@@ -126,6 +82,7 @@ export default class Triangle extends Object {
       const v0 = this.getVertsByIndex(this.vertexIndex[k * 3]);
       const v1 = this.getVertsByIndex(this.vertexIndex[k * 3 + 1]);
       const v2 = this.getVertsByIndex(this.vertexIndex[k * 3 + 2]);
+
       const obj = {
         tNear: 0,
         uv: {},
@@ -133,8 +90,11 @@ export default class Triangle extends Object {
       let ret = rayTriangleIntersect(v0, v1, v2, orig, dir, obj)
       if (ret) {
         param.distance = obj.tNear;
+        param.tNear = obj.tNear;
         param.uvK = obj.uv
         param.indexK = k;
+        param.hit_obj = this
+
         return param
       } else {
         return null

@@ -43,7 +43,7 @@ export default class TrialgleMesh {
         v2.y,
         v2.z,
       ]
-      const t = new Triangle(triangleVerts, [0, 1, 2], 1, [], bounds3)
+      const t = new Triangle(triangleVerts, [0, 1, 2], 1, [], bounds3,i)
       t.diffuseColor = new Vector3(0.5, 0.5, 0.5);
       t.materialType = MaterialType.DIFFUSE_AND_GLOSSY
       t.Ks = 1
