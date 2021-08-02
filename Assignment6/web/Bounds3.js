@@ -80,10 +80,12 @@ export default class Bounds3 {
     t2 = (this.pMax.x - ray.origin.x) * invDir.x;
     var txmin = (dirIsNeg[0] > 0) ? t1 : t2;
     var txmax = (dirIsNeg[0] > 0) ? t2 : t1;
+
     t1 = (this.pMin.y - ray.origin.y) * invDir.y;
     t2 = (this.pMax.y - ray.origin.y) * invDir.y;
     var tymin = (dirIsNeg[1] > 0) ? t1 : t2;
     var tymax = (dirIsNeg[1] > 0) ? t2 : t1;
+
     t1 = (this.pMin.z - ray.origin.z) * invDir.z;
     t2 = (this.pMax.z - ray.origin.z) * invDir.z;
     var tzmin = (dirIsNeg[2] > 0) ? t1 : t2;
@@ -97,6 +99,33 @@ export default class Bounds3 {
     else
       return false;
   }
+  // IntersectP(r) {
+  //   var tmin, tmax, tymin, tymax, tzmin, tzmax;
+
+  //   tmin = (bounds[r.sign[0]].x - r.orig.x) * r.invdir.x;
+  //   tmax = (bounds[1 - r.sign[0]].x - r.orig.x) * r.invdir.x;
+  //   tymin = (bounds[r.sign[1]].y - r.orig.y) * r.invdir.y;
+  //   tymax = (bounds[1 - r.sign[1]].y - r.orig.y) * r.invdir.y;
+
+  //   if ((tmin > tymax) || (tymin > tmax))
+  //     return false;
+  //   if (tymin > tmin)
+  //     tmin = tymin;
+  //   if (tymax < tmax)
+  //     tmax = tymax;
+
+  //   tzmin = (bounds[r.sign[2]].z - r.orig.z) * r.invdir.z;
+  //   tzmax = (bounds[1 - r.sign[2]].z - r.orig.z) * r.invdir.z;
+
+  //   if ((tmin > tzmax) || (tzmin > tmax))
+  //     return false;
+  //   if (tzmin > tmin)
+  //     tmin = tzmin;
+  //   if (tzmax < tmax)
+  //     tmax = tzmax;
+
+  //   return true;
+  // }
 
   // 合并
   static Union(b1, b2) {

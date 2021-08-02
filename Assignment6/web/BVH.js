@@ -1,4 +1,5 @@
 import Bounds3 from './Bounds3.js'
+import { Vector3 } from './Vector3.js'
 
 const SplitMethod = {
   NAIVE: 0,
@@ -35,10 +36,37 @@ export default class BVHAccel {
   }
 
 
-  Intersect() { }
+  Intersect(orig, dir) {
+    return this.getIntersection(this.root,orig,dir)
+  }
 
-  getIntersection(node, ray) {
+  getIntersection(node, orig, dir) {
+    const dirisNeg = [
+      dir.x > 0,
+      dir.y > 0,
+      dir.z > 0,
+    ]
+    const invDir = new Vector3(1/dir.x, 1/dir.y, 1/dir.z)
+    const ray = {
+      origin: orig,
+    }
 
+    if (node.bounds.IntersectP(ray, invDir, dirisNeg) == false) {
+      return null
+    }
+
+    if (node.left == null && node.right == null) {
+      return node.object.getIntersection(orig, dir);
+    }
+
+    const hit1 = this.getIntersection(node.left, orig, dir);
+    const hit2 = this.getIntersection(node.right, orig, dir);
+    if (hit1 && hit2) {
+      return (hit1.distance < hit2.distance) ? hit1 : hit2;
+    }
+    if (hit2 || hit1) {
+      debugger
+    }
   }
 
 
@@ -53,7 +81,7 @@ export default class BVHAccel {
 
     if (objects.length == 1) {
       node.bounds = objects[0].getBounds();
-      node.object = objects[0];
+      node.object = objects[0]
       node.left = null;
       node.right = null;
       return node;

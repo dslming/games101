@@ -11,9 +11,9 @@ export default class TrialgleMesh {
     // 计算aabb
     const bounds3 = new Bounds3()
     verts.forEach(item => {
-      const x = item.x * 50
-      const y = item.y * 50
-      const z = item.z * 50
+      const x = item.x
+      const y = item.y
+      const z = item.z
       bounds3.pMin.min({ x, y, z })
       bounds3.pMax.max({ x, y, z })
     });
@@ -50,6 +50,20 @@ export default class TrialgleMesh {
       this.triangles.push(t)
     }
 
-    new BVHAccel(this.triangles)
+    this.bvh = new BVHAccel(this.triangles)
+    this.bvh.name = "triangles"
+    console.error(this.bvh);
+
+    this.bounds3 = bounds3
+  }
+
+  getBounds() {
+    return this.bounds3
+  }
+
+  getIntersection(orig, dir) {
+    if (this.bvh) {
+      return this.bvh.Intersect(orig, dir);
+    }
   }
 }

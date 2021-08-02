@@ -15,6 +15,7 @@ export default class Scene {
 
   buildBVH() {
     this.bvh = new BVHAccel(this.objects)
+    this.bvh.name = "scene"
   }
 
   AddObj(object) {
@@ -30,5 +31,8 @@ export default class Scene {
 
   get_lights() {
     return this.lights
+  }
+  intersect(orig, dir) {
+    return this.bvh.Intersect(orig, dir);
   }
 }

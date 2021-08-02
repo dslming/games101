@@ -119,4 +119,26 @@ export default class Triangle extends Object {
   //   // return lerp(Vector3f(0.815, 0.235, 0.031), Vector3f(0.937, 0.937, 0.231), pattern);
   //   return new Vector3(0,1,0)
   // }
+  getIntersection(orig, dir) {
+    // const { tNearK: tnear } = param
+    const param = {}
+    for (var k = 0; k < this.numTriangles; ++k) {
+      const v0 = this.getVertsByIndex(this.vertexIndex[k * 3]);
+      const v1 = this.getVertsByIndex(this.vertexIndex[k * 3 + 1]);
+      const v2 = this.getVertsByIndex(this.vertexIndex[k * 3 + 2]);
+      const obj = {
+        tNear: 0,
+        uv: {},
+      }
+      let ret = rayTriangleIntersect(v0, v1, v2, orig, dir, obj)
+      if (ret) {
+        param.distance = obj.tNear;
+        param.uvK = obj.uv
+        param.indexK = k;
+        return param
+      } else {
+        return null
+      }
+    }
+  }
 }

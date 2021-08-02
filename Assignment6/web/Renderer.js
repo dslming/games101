@@ -123,8 +123,8 @@ function castRay(orig, dir, scene, depth) {
   }
 
   var hitColor = scene.backgroundColor;
-  var payload = trace(orig.clone(), dir.clone(), scene.get_objects());
-
+  // var payload = trace(orig.clone(), dir.clone(), scene.get_objects());
+  var payload = scene.intersect(orig.clone(), dir.clone())
   if (payload) {
     var temp1 = new Vector3().copy(dir).multiplyScalar(payload.tNear);
     var temp2 = new Vector3().copy(orig)
@@ -246,7 +246,9 @@ export class Renderer {
     const framebuffer = []
     var scale = Math.tan(deg2rad(scene.fov * 0.5));
     var imageAspectRatio = scene.width / scene.height;
-    var eye_pos = new Vector3(-1, 5, 10)
+    // var eye_pos = new Vector3(-1, 5, 10)
+    var eye_pos = new Vector3(0, 0, 0)
+
 
     var m = 0;
     for (var j = 0; j < scene.height; ++j) {
@@ -255,7 +257,15 @@ export class Renderer {
         var y;
         x = imageAspectRatio * (2 * (i + 0.5) / scene.width - 1);
         y = 1 - (2 * (j + 0.5) / scene.height);
+        let t = parseInt(scene.height / 2)
+        let b = parseInt(scene.width / 2)
+
         var dir = new Vector3(x, y, -1).normalize()
+         if (j == t && i == b) {
+           console.error(dir);
+         }
+        dir = { x: 0, y: -0, z: -1 }
+        dir = new Vector3(dir.x, dir.y, dir.z)
         framebuffer[m++] = castRay(eye_pos, dir, scene, 0);
       }
       // UpdateProgress(j / (var) scene.height);
