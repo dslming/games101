@@ -1,32 +1,43 @@
 import Scene from './Scene.js'
-import { Vector3 } from './Vector3.js'
+import { Vector3 } from './math/Vector3.js'
 import { loadObj } from './global.js'
 import { Renderer } from './Renderer.js'
-import CanvasTool from './CanvasTool.js'
+import CanvasTool from './tool/CanvasTool.js'
 import Light from './Light.js'
 import TrialgleMesh from './TrialglesMesh.js'
 import Material from './Material.js'
 
 export default class App {
   constructor() {
-    this.buildScene(256)
+    const size = 256
+    this.buildScene(size, size)
   }
 
   async buildScene(w, h) {
-    // 加载模型
-    const left = await loadObj("../models/cornellbox/left.obj")
+    this.scene = new Scene(w, h)
+    this.renderer = new Renderer()
+    this.initCanvas(w, h)
+
+
 
     // 创建材质
-    const red = new Material(Vector3(0.0));
-    red.Kd = Vector3(0.63, 0.065, 0.05);
+    const red = new Material(new Vector3(0,0,0));
+    red.Kd = new Vector3(0.63, 0.065, 0.05);
 
-    this.scene = new Scene(w, h)
-    this.initCanvas(w, h)
-    this.renderer = new Renderer()
-    const mesh = new TrialgleMesh(objInfo.verts, objInfo.faces)
-    this.scene.AddObj(mesh)
+    // 加载模型
+    // const left = await loadObj("../models/cornellbox/left.obj")
+    // const leftMesh = new TrialgleMesh(left.verts, left.faces)
+    const shortbox = await loadObj("../models/cornellbox/cube.obj")
+    // const bunny = await loadObj("../models/bunny/bunny.obj")
+
+    const shortboxMesh = new TrialgleMesh(shortbox.verts, shortbox.faces, red)
+    // const bunnyMesh = new TrialgleMesh(bunny.verts, bunny.faces, red)
+
+    // this.scene.AddObj(bunnyMesh)
+    this.scene.AddObj(shortboxMesh)
+
+
     this.scene.buildBVH()
-
     const light = new Light(new Vector3(20, 20, 10), 1)
     this.scene.AddLight(light)
     this.update()

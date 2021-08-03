@@ -1,4 +1,4 @@
-import Vector3 from './math/Vector3.js'
+import {Vector3} from './math/Vector3.js'
 import { EPSILON, get_random_float, M_PI } from './global.js'
 
 export default class Material {

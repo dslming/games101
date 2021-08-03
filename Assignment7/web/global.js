@@ -11,7 +11,7 @@ function get_random_float() {
 }
 
 function loadObj(url) {
-  const scale = 20
+  const scale = 1
   return new Promise((resolve, rejuect) => {
     new OBJLoader().load(url, (ret) => {
       ret.verts.forEach(item => {
@@ -19,7 +19,6 @@ function loadObj(url) {
         item.y = item.y * scale
         item.z = item.z * scale
       });
-      console.error(ret);
 
       resolve({
         verts: ret.verts,

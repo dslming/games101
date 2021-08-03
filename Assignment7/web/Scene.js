@@ -1,4 +1,4 @@
-import { Vector3 } from './Vector3.js'
+import { Vector3 } from './math/Vector3.js'
 import BVHAccel from './BVH.js'
 
 export default class Scene {

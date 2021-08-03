@@ -1,7 +1,6 @@
 import Triangle from './Triangle.js'
-import Bounds3 from './matg/Bounds3.js'
-import { MaterialType } from './global.js'
-import { Vector3 } from './Vector3.js'
+import Bounds3 from './math/Bounds3.js'
+import { Vector3 } from './math/Vector3.js'
 import BVHAccel from './BVH.js'
 
 // 三角形组成的mesh
@@ -44,10 +43,9 @@ export default class TrialgleMesh {
       ]
       const t = new Triangle({
         verts: triangleVerts,
-        vertsIndex: [0, 1, 2],
         bounds: bounds3,
         name: "triangle_" + i,
-        material
+        material: material
       })
       this.triangles.push(t)
     }
