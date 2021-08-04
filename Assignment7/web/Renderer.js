@@ -1,4 +1,5 @@
 import { Vector3 } from './math/Vector3.js';
+import { deg2rad } from './global.js'
 
 // Compute reflection direction
 export function reflect(I, N) {
@@ -63,20 +64,22 @@ export class Renderer {
   Render(scene) {
     const framebuffer = []
     var imageAspectRatio = scene.width / scene.height;
-    // var eye_pos = new Vector3(-1, 5, 10)
+    var eye_pos = new Vector3(278, 273, -800)
+    // Vector3f eye_pos(278, 273, -800);
+
     // var eye_pos = new Vector3(0, 0, 1)
-    var eye_pos = new Vector3(0, 0.1, 600)
+    // var eye_pos = new Vector3(0, 0, 0)
 
-
-    var m = 0;
+    let m = 0
+    const scale = Math.tan(deg2rad(scene.fov * 0.5));
     for (var j = 0; j < scene.height; ++j) {
       for (var i = 0; i < scene.width; ++i) {
         var x;
         var y;
-        x = imageAspectRatio * (2 * (i + 0.5) / scene.width - 1);
-        y = 1 - (2 * (j + 0.5) / scene.height);
+        x = imageAspectRatio * (2 * (i + 0.5) / scene.width - 1) * scale
+        y = 1 - (2 * (j + 0.5) / scene.height) * scale
 
-        var dir = new Vector3(x, y, -200).normalize()
+        var dir = new Vector3(-x, y, 1).normalize()
         framebuffer[m++] = castRay(eye_pos, dir, scene, 0);
       }
     }

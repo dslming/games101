@@ -1,11 +1,6 @@
 import Bounds3 from './math/Bounds3.js'
 import { Vector3 } from './math/Vector3.js'
 
-const SplitMethod = {
-  NAIVE: 0,
-  SAH: 1
-}
-
 class BVHBuildNode {
   constructor() {
     this.bounds = new Bounds3()
@@ -18,14 +13,8 @@ class BVHBuildNode {
 
 
 export default class BVHAccel {
-  constructor(primitives, maxPrimsInNode = 1) {
-    this.splitAxis = 0
-    this.firstPrimOffset = 0
-    this.nPrimitives = 0
-
-    this.maxPrimsInNode = maxPrimsInNode
+  constructor(primitives) {
     this.primitives = primitives
-
     if (primitives.length == 0) {
       return
     }
@@ -63,11 +52,11 @@ export default class BVHAccel {
     if (hit1 && hit2) {
       return (hit1.distance < hit2.distance) ? hit1 : hit2;
     }
-    if (hit1 && !hit2) {
+    if (hit1) {
       return hit1
     }
 
-    if (hit2 && !hit1) {
+    if (hit2) {
       return hit2
     }
   }
@@ -83,7 +72,6 @@ export default class BVHAccel {
     for (let i = 0; i < objects.length; ++i) {
       bounds = Bounds3.Union(bounds, objects[i].getBounds());
     }
-
     if (objects.length == 1) {
       node.bounds = objects[0].getBounds();
       node.object = objects[0]

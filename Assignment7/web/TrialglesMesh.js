@@ -41,6 +41,7 @@ export default class TrialgleMesh {
         new Vector3(v1.x, v1.y, v1.z),
         new Vector3(v2.x, v2.y, v2.z),
       ]
+      // console.error(triangleVerts);
       const t = new Triangle({
         verts: triangleVerts,
         bounds: bounds3,
@@ -49,7 +50,6 @@ export default class TrialgleMesh {
       })
       this.triangles.push(t)
     }
-
     this.bvh = new BVHAccel(this.triangles)
     this.bvh.name = "triangles"
     this.bounds3 = bounds3

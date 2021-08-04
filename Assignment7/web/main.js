@@ -25,16 +25,37 @@ export default class App {
     red.Kd = new Vector3(0.63, 0.065, 0.05);
 
     // 加载模型
-    // const left = await loadObj("../models/cornellbox/left.obj")
-    // const leftMesh = new TrialgleMesh(left.verts, left.faces)
-    const shortbox = await loadObj("../models/cornellbox/cube.obj")
-    // const bunny = await loadObj("../models/bunny/bunny.obj")
+    const left = await loadObj("../models/cornellbox/left.obj")
+    const shortbox = await loadObj("../models/cornellbox/shortbox.obj")
+    const right = await loadObj("../models/cornellbox/right.obj")
+
+    /**
+     * [1]     [2]
+     *
+     *
+     *
+     * [0]
+     */
+    // const z = -10
+    // var verts = [
+    //   { x: 5, y: -5, z: z },  //[0]
+    //   { x: 5, y: 5, z: z },   //[1]
+    //   { x: 8, y: 5, z: z },   //[2]
+    // ];
+    // const a = [
+    //   // [2, 1, 0], //ok
+    //   // [1, 0, 2] //no
+    //   // [0, 2, 1],   //ok
+    // ]
 
     const shortboxMesh = new TrialgleMesh(shortbox.verts, shortbox.faces, red)
+    const leftMesh = new TrialgleMesh(left.verts, left.faces, red)
+    const rightMesh = new TrialgleMesh(right.verts, right.faces, red)
     // const bunnyMesh = new TrialgleMesh(bunny.verts, bunny.faces, red)
 
-    // this.scene.AddObj(bunnyMesh)
+    this.scene.AddObj(leftMesh)
     this.scene.AddObj(shortboxMesh)
+    this.scene.AddObj(rightMesh)
 
 
     this.scene.buildBVH()

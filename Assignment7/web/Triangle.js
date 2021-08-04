@@ -49,7 +49,12 @@ export default class Triangle extends Object {
 
   getIntersection(orig, dir) {
     const [v0, v1, v2] = this.vertices
-    let ret = rayTriangleIntersect(v0, v1, v2, orig, dir)
+    let ret = rayTriangleIntersect(
+      v0.clone(),
+      v1.clone(),
+      v2.clone(),
+      orig.clone(),
+      dir.clone())
     if (ret) {
       ret.hitObj = this
     }
