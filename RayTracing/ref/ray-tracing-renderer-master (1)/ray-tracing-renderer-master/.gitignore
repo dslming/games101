@@ -1,0 +1,11 @@
+# hidden config files
+.DS_Store
+
+# dependencies
+node_modules
+
+# file with environment variables
+.env
+
+# artifacts from tests
+coverage/
