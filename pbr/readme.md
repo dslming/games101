@@ -17,6 +17,8 @@ $$
 f_r = k_d f_{lambert} + k_s f_{cook-torrance}
 $$
 
+$L_o(p, \omega_o) = \int_\Omega f_r(p, \omega_i, \omega_o) L_i(p, \omega_i) n \omega_i d\omega_i$
+
 $$
 f_{lambert} = \frac{p}{\pi}
 $$
